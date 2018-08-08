@@ -9,8 +9,11 @@ import (
 )
 
 func main() {
+	log.SetFlags(log.Ldate | log.Ltime | log.LUTC | log.Lshortfile)
+
 	h := routes.NewRouter()
 	logutil.Debug("Using apex/gateway")
+
 	log.Fatal(gateway.ListenAndServe("",
 		handlers.RecoveryHandler()(h)))
 }

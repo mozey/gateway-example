@@ -19,17 +19,15 @@ clean:
 	go clean
 
 # run formatting tool and build
-build: dependencies clean
+build.dev: dependencies clean
 	/usr/bin/env bash -c scripts/build.dev.sh
 
-# run unit tests with code coverage
-test: dependencies
-	go test -cover
+build: dependencies clean test
+	/usr/bin/env bash -c scripts/build.sh
 
-# generate code coverage report
-coverage: test
-	go test -coverprofile=.coverage.out
-	go tool cover -html=.coverage.out
+# run tests
+test: dependencies
+	gotest ./internal...
 
 # attempt to kill running server
 kill:
@@ -40,10 +38,14 @@ kill:
 restart:
 	@echo restart
 	@make kill
-	@make build; (if [ "$$?" -eq 0 ]; then (./${PROG} &); fi)
+	@make build.dev; (if [ "$$?" -eq 0 ]; then (./${PROG} &); fi)
 
 # watch .go files for changes then recompile & try to start server
 # will also kill server after ctrl+c
 dev: dependencies
 	@make restart
 	@fswatch -or ./ -e dev.out | xargs -n1 -I{} make restart || make kill
+
+deploy: build
+	/usr/bin/env bash -c scripts/deploy
+

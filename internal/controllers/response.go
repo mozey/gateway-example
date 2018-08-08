@@ -14,11 +14,17 @@ type Response struct {
 }
 
 func Respond(w http.ResponseWriter, r interface{}) {
-	start, err := time.Parse(time.RFC3339, w.Header().Get("X-Execution-Start"))
-	if err != nil {
-		log.Panic(err)
+	startHeader := w.Header().Get("X-Execution-Start")
+	if startHeader != "" {
+		// Header will be empty when testing
+		start, err := time.Parse(time.RFC3339, startHeader)
+		if err == nil {
+			diff := time.Since(start)
+			w.Header().Set("X-Execution-Duration-s",
+				fmt.Sprintf("%v", diff.Seconds()))
+		} else {
+			log.Print(err)
+		}
 	}
-	diff := time.Since(start)
-	w.Header().Set("X-Execution-Duration-s", fmt.Sprintf("%v", diff.Seconds()))
 	json.NewEncoder(w).Encode(r)
 }

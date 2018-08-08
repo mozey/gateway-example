@@ -33,6 +33,7 @@ non-persistent disk space in its own /tmp directory..."
     go run ${APP_DIR}/cmd/dev/dev.go &
     http localhost:8080
     http "localhost:8080/foo?foo=asdf"
+    http "localhost:8080/foo?foo=panic"
     http "localhost:8080/nomatch"
     
     
@@ -128,6 +129,10 @@ Run dev server with live reload
     $(./config)
     
     make dev
+    
+Build and deploy
+
+    make deploy
 
 
 # Caller id
