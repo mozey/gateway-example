@@ -3,9 +3,10 @@ package controllers
 import (
 	"encoding/json"
 	"time"
-	"fmt"
 	"net/http"
 	"log"
+	"fmt"
+	"github.com/mozey/gateway/internal/middleware"
 )
 
 // Response contains a simple message response.
@@ -14,17 +15,16 @@ type Response struct {
 }
 
 func Respond(w http.ResponseWriter, r interface{}) {
-	startHeader := w.Header().Get("X-Execution-Start")
-	if startHeader != "" {
-		// Header will be empty when testing
-		start, err := time.Parse(time.RFC3339, startHeader)
-		if err == nil {
-			diff := time.Since(start)
-			w.Header().Set("X-Execution-Duration-s",
-				fmt.Sprintf("%v", diff.Seconds()))
-		} else {
-			log.Print(err)
-		}
+	startHeader := w.Header().Get(middleware.HeaderExecutionStart)
+	w.Header().Del(middleware.HeaderExecutionStart)
+	start, err := time.Parse(
+		middleware.HeaderExecutionStartFormat, startHeader)
+	if err == nil {
+		diff := time.Since(start)
+		w.Header().Set(middleware.HeaderExecutionDurationS,
+			fmt.Sprintf("%v", diff.Seconds()))
+	} else {
+		log.Print(err)
 	}
 	json.NewEncoder(w).Encode(r)
 }
