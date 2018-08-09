@@ -5,9 +5,8 @@ import (
 	"io/ioutil"
 	"io"
 	"log"
-	"encoding/json"
-	"fmt"
 	"net/url"
+	"github.com/mozey/gateway/internal/middleware"
 )
 
 const megabytes = 1048576
@@ -62,9 +61,5 @@ func Echo(w http.ResponseWriter, r *http.Request) {
 	e.RemoteAddr = r.RemoteAddr
 	e.RequestURI = r.RequestURI
 
-	b, err := json.Marshal(e)
-	if err != nil {
-		log.Fatal(err)
-	}
-	fmt.Fprint(w, string(b))
+	middleware.Respond(w, e)
 }

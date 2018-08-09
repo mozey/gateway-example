@@ -2,10 +2,10 @@ package controllers
 
 import (
 	"net/http"
-	"encoding/json"
-	"fmt"
 	"github.com/mozey/logutil"
 	"log"
+	"github.com/mozey/gateway/internal/middleware"
+	"fmt"
 )
 
 func Foo(w http.ResponseWriter, r *http.Request) {
@@ -13,15 +13,16 @@ func Foo(w http.ResponseWriter, r *http.Request) {
 	fooParam := r.URL.Query().Get("foo")
 	if fooParam == "" {
 		logutil.Debug("Missing foo")
-		msg := Response{Message: "Missing foo"}
+		msg := middleware.ResponseMsg{Message: "Missing foo"}
 		w.WriteHeader(http.StatusBadRequest)
-		json.NewEncoder(w).Encode(msg)
+		middleware.Respond(w, msg)
 		return
 	}
 	if fooParam == "panic" {
+		// Pass in foo=panic to see the RecoveryHandler in action
 		log.Panic("oops!")
 	}
-	msg := Response{Message: fmt.Sprintf("foo: %v", fooParam)}
-	json.NewEncoder(w).Encode(msg)
+	middleware.Respond(
+		w, middleware.ResponseMsg{Message: fmt.Sprintf("foo: %v", fooParam)})
 }
 

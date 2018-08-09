@@ -23,7 +23,9 @@ var routes = Routes{
 		"/foo{ignore:.*}", controllers.Foo,
 	},
 	Route{
-		"/bar{ignore:.*}", controllers.Bar,
+		"/bar{ignore:.*}",
+		middleware.WithAuth(
+			middleware.Auth{}, http.HandlerFunc(controllers.Bar)),
 	},
 
 	// Echo request when no match

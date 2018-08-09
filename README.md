@@ -34,7 +34,9 @@ non-persistent disk space in its own /tmp directory..."
     http localhost:8080
     http "localhost:8080/foo?foo=asdf"
     http "localhost:8080/foo?foo=panic"
-    http "localhost:8080/nomatch"
+    http "localhost:8080/bar?key=xxx"
+    http "localhost:8080/bar?key=123"
+    http "localhost:8080/echo_if_no_match"
     
     
 # Create lambda fn and API
