@@ -2,7 +2,7 @@
 # https://gist.github.com/lantins/e83477d8bccab83f078d
 
 # binary name to kill/restart
-PROG = dev.out
+PROG_DEV = dev.out
 
 # targets not associated with files
 .PHONY: dependencies default build test coverage clean kill restart serve
@@ -18,34 +18,46 @@ default: dependencies test
 clean:
 	go clean
 
-# run formatting tool and build
+# dev...........................................................................
+# Local server with live reload
+
 build.dev: dependencies clean
 	/usr/bin/env bash -c scripts/build.dev.sh
 
-build: dependencies clean test
-	/usr/bin/env bash -c scripts/build.sh
-
-# run tests
-test: dependencies
-	gotest ./internal...
-
 # attempt to kill running server
-kill:
-	@echo kill
-	-@killall -9 $(PROG) 2>/dev/null || true
+kill.dev:
+	@echo kill.dev
+	-@killall -9 $(PROG_DEV) 2>/dev/null || true
 
 # attempt to build and start server
-restart:
-	@echo restart
-	@make kill
-	@make build.dev; (if [ "$$?" -eq 0 ]; then (./${PROG} &); fi)
+restart.dev:
+	@echo restart.dev
+	@make kill.dev
+	@make build.dev; (if [ "$$?" -eq 0 ]; then (./${PROG_DEV} &); fi)
 
 # watch .go files for changes then recompile & try to start server
 # will also kill server after ctrl+c
 dev: dependencies
-	@make restart
-	@fswatch -or ./ -e dev.out | xargs -n1 -I{} make restart || make kill
+	@make restart.dev
+	@fswatch -or ./ -e dev.out | \
+	xargs -n1 -I{} make restart.dev || make kill.dev
+
+# container.....................................................................
+# TODO Docker container with live reload
+
+# lambda........................................................................
+test: dependencies
+	gotest ./internal...
+
+build: clean test
+	/usr/bin/env bash -c scripts/build.sh
 
 deploy: build
 	/usr/bin/env bash -c scripts/deploy
+
+
+
+
+
+
 

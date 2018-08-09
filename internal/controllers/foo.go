@@ -14,8 +14,7 @@ func Foo(w http.ResponseWriter, r *http.Request) {
 	if fooParam == "" {
 		logutil.Debug("Missing foo")
 		msg := middleware.ResponseMsg{Message: "Missing foo"}
-		w.WriteHeader(http.StatusBadRequest)
-		middleware.Respond(w, r, msg)
+		middleware.RespondWithCode(http.StatusBadRequest, w, r, msg)
 		return
 	}
 	if fooParam == "panic" {

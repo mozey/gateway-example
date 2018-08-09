@@ -120,21 +120,72 @@ Call API (DNS may take some time to propagate)
 
 # Makefile
 
-Install dependencies
+Install dependencies   
 
+    brew install tmux
+    
     brew install fswatch
 
-Run dev server with live reload    
-
+Run with live reload    
+    
     cd ${GOPATH}/src/github.com/mozey/gateway
     
     $(./config)
     
     make dev
     
-Build and deploy
+Build and deploy lambda fn
 
     make deploy
+        
+tmux workflow
+    
+    tmux new -d -s mozey-gateway \
+    'cd ${GOPATH}/src/github.com/mozey/gateway && $(./config) && make dev'
+    
+    tmux ls
+    
+    tmux a -t mozey-gateway # ctrl-b d
+    
+    tmux send-keys -t mozey-gateway C-c
+    
+fswatch all files except `dev.out`
+
+    cd ${GOPATH}/src/github.com/mozey/gateway
+    
+    fswatch -or ./ -e dev.out
+
+
+# Show processes listening on port
+
+    lsof -nP -i4TCP:8080 | grep LISTEN
+    
+    
+# Docker container with live reload
+
+Build container exe
+
+    cd ${GOPATH}/src/github.com/mozey/gateway
+    
+    $(./config)
+    
+    ${APP_DIR}/scripts/build.container.sh
+    
+Create container
+
+    ${APP_DIR}/scripts/create.container.sh
+
+Run container
+
+    docker stop mozey-gateway
+    docker run -it -d --rm --name mozey-gateway \
+    -p 8080:8080 \
+    -v ${APP_DIR}/build:/mnt/build \
+    mozey-gateway /mnt/build/container.out
+    
+Test
+
+    http localhost:8080
 
 
 # Caller id
