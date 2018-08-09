@@ -61,5 +61,5 @@ func Echo(w http.ResponseWriter, r *http.Request) {
 	e.RemoteAddr = r.RemoteAddr
 	e.RequestURI = r.RequestURI
 
-	middleware.Respond(w, e)
+	middleware.Respond(w, r, e)
 }

@@ -15,7 +15,7 @@ func Foo(w http.ResponseWriter, r *http.Request) {
 		logutil.Debug("Missing foo")
 		msg := middleware.ResponseMsg{Message: "Missing foo"}
 		w.WriteHeader(http.StatusBadRequest)
-		middleware.Respond(w, msg)
+		middleware.Respond(w, r, msg)
 		return
 	}
 	if fooParam == "panic" {
@@ -23,6 +23,6 @@ func Foo(w http.ResponseWriter, r *http.Request) {
 		log.Panic("oops!")
 	}
 	middleware.Respond(
-		w, middleware.ResponseMsg{Message: fmt.Sprintf("foo: %v", fooParam)})
+		w, r, middleware.ResponseMsg{Message: fmt.Sprintf("foo: %v", fooParam)})
 }
 

@@ -8,6 +8,6 @@ import (
 
 func Index(w http.ResponseWriter, r *http.Request) {
 	logutil.Debug("Index")
-	middleware.Respond(w, middleware.ResponseMsg{Message: "It works!"})
+	middleware.Respond(w, r, middleware.ResponseMsg{Message: "It works!"})
 }
 

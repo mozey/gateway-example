@@ -25,8 +25,8 @@ func WithAuth(a Auth, inner http.Handler) http.HandlerFunc {
 
 		userID, err := a.Authorise(key)
 		if err != nil {
-			RespondWithCode(
-				http.StatusUnauthorized, w, ResponseMsg{Message: err.Error()})
+			RespondWithCode(http.StatusUnauthorized,
+				w, r, ResponseMsg{Message: err.Error()})
 			return
 		}
 
