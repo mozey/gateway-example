@@ -37,9 +37,11 @@ restart.dev:
 
 # watch .go files for changes then recompile & try to start server
 # will also kill server after ctrl+c
+# fswatch includes everything unless an exclusion filter says otherwise
+# https://stackoverflow.com/a/37237681/639133
 dev: dependencies
 	@make restart.dev
-	@fswatch -or ./ -e dev.out | \
+	@fswatch -or --exclude ".*" --include "\\.go$$" ./ | \
 	xargs -n1 -I{} make restart.dev || make kill.dev
 
 # container.....................................................................

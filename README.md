@@ -109,21 +109,38 @@ Run with live reload
 Build and deploy lambda fn
 
     $(./config -env prod) && make deploy
-        
-tmux workflow
     
-    tmux new -d -s mozey-gateway '$(./config}) && make dev'
+fswatch only `*.go` file in current dir,
+note that the $ sign must be escaped in the Makefile
+
+    fswatch -or --exclude ".*" --include "\\.go$" ./
+      
+        
+# tmux
+    
+Run dev server with live reload in a named session and detach
+
+    APP_DIR=${GOPATH}/src/github.com/mozey/gateway
+    tmux new -d -s mozey-gateway "cd ${APP_DIR}; \
+    $(${APP_DIR}/config); \
+    make dev"
+
+List sessions
     
     tmux ls
     
-    tmux a -t mozey-gateway # ctrl-b d
+Attach to running session
+
+    tmux a -t mozey-gateway
     
+Detach 
+
+    ctrl-b d 
+    
+Send ctrl+c to kill dev server and quit session
+
     tmux send-keys -t mozey-gateway C-c
     
-fswatch all files except `dev.out`
-
-    fswatch -or ${APP_DIR}/ -e dev.out
-
 
 # Show processes listening on port
 

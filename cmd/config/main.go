@@ -68,10 +68,6 @@ func main() {
 		configKeys = append(configKeys, k)
 	}
 
-	// Config file must be in app dir
-	configKeys = append(configKeys, "APP_DIR")
-	c["APP_DIR"] = path.Dir(config)
-
 	// Sort
 	sort.Strings(configKeys)
 
