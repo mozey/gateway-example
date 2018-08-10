@@ -6,6 +6,8 @@ import (
 	"github.com/mozey/gateway/internal/routes"
 	"github.com/mozey/logutil"
 	"github.com/gorilla/handlers"
+	"os"
+	"fmt"
 )
 
 func main() {
@@ -14,7 +16,9 @@ func main() {
 	h := routes.NewRouter()
 	logutil.Debug("Using net/http")
 
-	log.Fatal(http.ListenAndServe(":8080",
+	port := os.Getenv("APP_PORT")
+
+	log.Fatal(http.ListenAndServe(fmt.Sprintf(":%v", port),
 		handlers.RecoveryHandler(
 			handlers.PrintRecoveryStack(true))(h)))
 }
