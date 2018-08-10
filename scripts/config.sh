@@ -8,11 +8,10 @@ set -eu
 # return code of the whole pipeline.
 bash -c 'set -o pipefail'
 
-GOPATH=${GOPATH}
+APP_DIR=${APP_DIR}
 
 # Compile config util
 export APP_DEBUG=true
-APP_DIR=${GOPATH}/src/github.com/mozey/gateway
 cd ${APP_DIR}
 go build -ldflags "-X main.AppDir=${APP_DIR}" -o ./config ./cmd/config
 

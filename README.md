@@ -19,7 +19,7 @@ Remember to set your `AWS_PROFILE` in the prod config,
 see [aws cli](https://docs.aws.amazon.com/cli/latest/userguide/cli-multiple-profiles.html)
 The dev config uses [aws-local](https://github.com/mozey/aws-local)
 
-    ./scripts/config.sh
+    export APP_DIR=$(pwd) && ./scripts/config.sh
     
     $(./config)
     
