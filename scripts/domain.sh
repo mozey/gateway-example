@@ -174,7 +174,7 @@ fi
 
 # ..............................................................................
 
-${APP_DIR}/config \
+${APP_DIR}/config -env prod \
 -key "APP_CERT_ARN" -value "${APP_CERT_ARN}" \
 -key "APP_API_CUSTOM_ENDPOINT" -value "${APP_API_CUSTOM_ENDPOINT}" \
 -key "APP_DNS_HOSTED_ZONE" -value "${APP_DNS_HOSTED_ZONE}" \

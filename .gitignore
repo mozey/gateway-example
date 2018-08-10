@@ -14,7 +14,12 @@
 _excluded
 
 build/main.zip
-config.json
+
+config.dev.json
+config.prod.json
+
 config
+!config/
+
 change-resource-record-sets.json
 

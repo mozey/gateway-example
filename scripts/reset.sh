@@ -72,9 +72,6 @@ then
         aws apigateway delete-rest-api --rest-api-id ${APP_API}
     fi
 
-    echo "Reset config"
-    cp ${APP_DIR}/config.sample.json ${APP_DIR}/config.json
-
     echo ""
     echo "Done"
 

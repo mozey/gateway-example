@@ -53,7 +53,7 @@ build: clean test
 	/usr/bin/env bash -c scripts/build.sh
 
 deploy: build
-	/usr/bin/env bash -c scripts/deploy
+	/usr/bin/env bash -c scripts/deploy.sh
 
 
 

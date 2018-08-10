@@ -100,7 +100,7 @@ APP_API_ENDPOINT="https://${APP_API}.execute-api.${APP_REGION}.amazonaws.com/${A
 
 # Update config...................................................................
 
-${APP_DIR}/config \
+${APP_DIR}/config -env prod \
 -key "APP_FN_POLICY_ARN" -value "${APP_FN_POLICY_ARN}" \
 -key "APP_ACCOUNT" -value "${APP_ACCOUNT}" \
 -key "APP_FN_ROLE_ARN" -value "${APP_FN_ROLE_ARN}" \

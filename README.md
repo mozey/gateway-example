@@ -3,6 +3,160 @@
 Serverless API example with Go and AWS Lambda using Apex Gateway
 
 
+# Quick start
+
+    go get github.com/mozey/gateway
+
+    cd ${GOPATH}/src/github.com/mozey/gateway
+
+Make scripts executable
+ 
+    chmod u+x ./scripts/*.sh
+
+Set env using `config` cmd, default env is dev.
+The config files must be in the package root.
+Remember to set your `AWS_PROFILE` in the prod config,  
+see [aws cli](https://docs.aws.amazon.com/cli/latest/userguide/cli-multiple-profiles.html)
+The dev config uses [aws-local](https://github.com/mozey/aws-local)
+
+    ./scripts/config.sh
+    
+    $(./config)
+    
+Print env
+
+    printenv | sort | grep -E 'AWS_|APP_'
+    
+Run dev server
+
+    go run ./cmd/dev/dev.go &
+
+Test
+    
+    http localhost:${APP_PORT}
+    http "localhost:${APP_PORT}/foo?foo=asdf"
+    http "localhost:${APP_PORT}/foo?foo=panic"
+    http "localhost:${APP_PORT}/bar?key=xxx"
+    http "localhost:${APP_PORT}/bar?key=123"
+    http "localhost:${APP_PORT}/echo_if_no_match"
+    
+    
+# Create lambda fn and API
+
+Clear env
+
+    unset $(compgen -v APP_)
+    
+Set prod env
+    
+    $(./config -env prod)
+
+Build the exe
+
+    ./scripts/build.sh
+    
+Create lambda fn and API
+
+    ./scripts/create.sh && $(./config -env prod)
+    
+Call lambda endpoint
+
+    http ${APP_API_ENDPOINT}/foo?foo=foo
+    
+Add a custom domain to invoke the lambda fn via API gateway,
+all request methods and paths are forwarded to the lambda fn
+    
+    ./config -env prod \
+    -key APP_API_PATH -value "" \
+    -key APP_API_CUSTOM -value api.mozey.co \
+    -key APP_API_DOMAIN -value mozey.co \
+    -update
+    
+    $(./config -env prod) 
+    
+    ./scripts/domain.sh && $(./config -env prod)
+    
+Script will print an error message if cert is still validating.
+Wait for certificate validation to complete,
+then run the script again to finish setup
+    
+Call API (DNS may take some time to propagate)
+
+    http ${APP_API_CUSTOM_ENDPOINT}/foo?foo=foo
+    
+Deploy to update the lambda fn
+    
+    ./scripts/deploy.sh
+
+
+# Delete lambda fn and API
+
+    $(./config -env prod) && ./scripts/reset.sh
+
+
+# Makefile
+
+Install dependencies   
+
+    brew install tmux
+    
+    brew install fswatch
+
+Run with live reload    
+    
+    $(./config) && make dev
+    
+Build and deploy lambda fn
+
+    $(./config -env prod) && make deploy
+        
+tmux workflow
+    
+    tmux new -d -s mozey-gateway '$(./config}) && make dev'
+    
+    tmux ls
+    
+    tmux a -t mozey-gateway # ctrl-b d
+    
+    tmux send-keys -t mozey-gateway C-c
+    
+fswatch all files except `dev.out`
+
+    fswatch -or ${APP_DIR}/ -e dev.out
+
+
+# Show processes listening on port
+
+    lsof -nP -i4TCP:${APP_PORT} | grep LISTEN
+    
+    
+# Docker container with live reload
+
+Build container exe
+
+    export APP_DIR=${GOPATH}/src/github.com/mozey/gateway
+    
+    $(./config})
+    
+    ./scripts/build.container.sh
+    
+Create container
+
+    ./scripts/create.container.sh
+
+Run container
+
+    docker stop mozey-gateway
+    docker run -it -d --rm --name mozey-gateway \
+    -p ${APP_PORT}:${APP_PORT} \
+    -v ./build:/mnt/build \
+    mozey-gateway /mnt/build/container.out
+    
+Test
+
+    http localhost:${APP_PORT}
+
+
 # [apex/gateway](https://github.com/apex/gateway)
 
 ...provides a drop-in replacement for net/http's ListenAndServe 
@@ -22,170 +176,6 @@ Pass in an optional path prefix when creating the fn
 Use a [shared library](https://stackoverflow.com/a/35060357/639133) 
 if the lambda zip [size limit](https://docs.aws.amazon.com/lambda/latest/dg/limits.html)
 becomes an issue: "Each Lambda function receives an additional 512MB of 
-non-persistent disk space in its own /tmp directory..."
-
-
-# Run locally for dev
-
-    export APP_DIR=${GOPATH}/src/github.com/mozey/gateway
-    
-    # net/http
-    go run ${APP_DIR}/cmd/dev/dev.go &
-    http localhost:8080
-    http "localhost:8080/foo?foo=asdf"
-    http "localhost:8080/foo?foo=panic"
-    http "localhost:8080/bar?key=xxx"
-    http "localhost:8080/bar?key=123"
-    http "localhost:8080/echo_if_no_match"
-    
-    
-# Create lambda fn and API
-
-Set application working dir
-
-    export APP_DIR=${GOPATH}/src/github.com/mozey/gateway
- 
-Make scripts executable
- 
-    chmod u+x ${APP_DIR}/scripts/*.sh
- 
-Set env using `config` cmd.
-The `config.json` file must be in the package root, 
-for multiple environments use this format `config.APP_CONFIG_ENV.json`.
-[AWS_PROFILE](https://docs.aws.amazon.com/cli/latest/userguide/cli-multiple-profiles.html)
-should be set in `config.json`
-
-    cp ${APP_DIR}/config.sample.json ${APP_DIR}/config.json
-    
-    cd ${APP_DIR}
-    go build -ldflags "-X main.AppDir=${APP_DIR}" -o ./config ./cmd/config
-    
-    ${APP_DIR}/config \
-    -key APP_REGION -value eu-west-2 \
-    -update
-    
-    $(${APP_DIR}/config)
-    
-Print env
-
-    printenv | sort | grep -E 'AWS_|APP_'
-    
-Build the exe
-
-    $(${APP_DIR}/config) && ${APP_DIR}/scripts/build.sh
-    
-Deploy to update the lambda fn
-    
-    $(${APP_DIR}/config) && ${APP_DIR}/scripts/deploy.sh
-
-Create lambda fn and API
-
-    $(${APP_DIR}/config) && ${APP_DIR}/scripts/create.sh
-    
-Call API
-
-    $(${APP_DIR}/config)
-    
-    http ${APP_API_ENDPOINT}/foo?foo=foo
-
-
-# Delete lambda fn and API
-
-    $(${APP_DIR}/config) && ${APP_DIR}/scripts/reset.sh
-
-
-# Custom domain
-    
-Add a custom domain to invoke the lambda fn via API gateway,
-all request methods and paths are forwarded to the lambda fn
-    
-    ${APP_DIR}/config \
-    -key APP_API_PATH -value "" \
-    -key APP_API_CUSTOM -value api.mozey.co \
-    -key APP_API_DOMAIN -value mozey.co \
-    -update
-    
-    $(${APP_DIR}/config) && ${APP_DIR}/scripts/domain.sh
-    
-Script will print an error message if cert is still validating.
-Wait for certificate validation to complete,
-then run the script again to finish setup
-    
-Call API (DNS may take some time to propagate)
-
-    $(${APP_DIR}/config)
-    
-    http ${APP_API_CUSTOM_ENDPOINT}/foo?foo=foo
-
-
-# Makefile
-
-Install dependencies   
-
-    brew install tmux
-    
-    brew install fswatch
-
-Run with live reload    
-    
-    cd ${GOPATH}/src/github.com/mozey/gateway
-    
-    $(./config)
-    
-    make dev
-    
-Build and deploy lambda fn
-
-    make deploy
-        
-tmux workflow
-    
-    tmux new -d -s mozey-gateway \
-    'cd ${GOPATH}/src/github.com/mozey/gateway && $(./config) && make dev'
-    
-    tmux ls
-    
-    tmux a -t mozey-gateway # ctrl-b d
-    
-    tmux send-keys -t mozey-gateway C-c
-    
-fswatch all files except `dev.out`
-
-    cd ${GOPATH}/src/github.com/mozey/gateway
-    
-    fswatch -or ./ -e dev.out
-
-
-# Show processes listening on port
-
-    lsof -nP -i4TCP:8080 | grep LISTEN
-    
-    
-# Docker container with live reload
-
-Build container exe
-
-    cd ${GOPATH}/src/github.com/mozey/gateway
-    
-    $(./config)
-    
-    ${APP_DIR}/scripts/build.container.sh
-    
-Create container
-
-    ${APP_DIR}/scripts/create.container.sh
-
-Run container
-
-    docker stop mozey-gateway
-    docker run -it -d --rm --name mozey-gateway \
-    -p 8080:8080 \
-    -v ${APP_DIR}/build:/mnt/build \
-    mozey-gateway /mnt/build/container.out
-    
-Test
-
-    http localhost:8080
 
 
 # Caller id
