@@ -12,6 +12,8 @@ bash -c 'set -o pipefail'
 APP_DIR=${APP_DIR}
 APP_FN_HANDLER=${APP_FN_HANDLER}
 
+mkdir ${APP_DIR}/build
+
 echo "Building exe"
 cd ${APP_DIR}
 env GOOS=linux GOARCH=amd64 go build \
