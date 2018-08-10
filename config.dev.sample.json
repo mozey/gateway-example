@@ -1,6 +1,6 @@
 {
     "APP_DEBUG": "true",
-    "APP_REGION": "eu-west-2",
     "APP_PORT": "8080",
+    "APP_REGION": "eu-west-2",
     "AWS_PROFILE": "aws-local"
 }
