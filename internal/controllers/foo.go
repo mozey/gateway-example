@@ -8,6 +8,7 @@ import (
 	"fmt"
 )
 
+// Foo route handler
 func Foo(w http.ResponseWriter, r *http.Request) {
 	logutil.Debug("Foo")
 	fooParam := r.URL.Query().Get("foo")
@@ -24,4 +25,3 @@ func Foo(w http.ResponseWriter, r *http.Request) {
 	middleware.Respond(
 		w, r, middleware.ResponseMsg{Message: fmt.Sprintf("foo: %v", fooParam)})
 }
-

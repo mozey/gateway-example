@@ -9,21 +9,19 @@ import (
 	"github.com/mozey/gateway/internal/middleware"
 )
 
-const megabytes = 1048576
+const kilobyte = 1024
 
-type EchoRequestBody struct {
-	String string
-}
-
-// Echo is the same as http.Request minus the bits that break json.Marshall
+// EchoRequest is the same as http.Request minus the bits that break json.Marshall
 type EchoRequest struct {
-	Method           string
-	URL              *url.URL
-	Proto            string // "HTTP/1.0"
-	ProtoMajor       int    // 1
-	ProtoMinor       int    // 0
-	Header           http.Header
-	Body             EchoRequestBody
+	Method     string
+	URL        *url.URL
+	Proto      string // "HTTP/1.0"
+	ProtoMajor int    // 1
+	ProtoMinor int    // 0
+	Header     http.Header
+	Body struct {
+		String string
+	}
 	ContentLength    int64
 	TransferEncoding []string
 	Host             string
@@ -45,8 +43,7 @@ func Echo(w http.ResponseWriter, r *http.Request) {
 	e.ProtoMajor = r.ProtoMajor
 	e.ProtoMinor = r.ProtoMinor
 	e.Header = r.Header
-	e.Body = EchoRequestBody{}
-	body, err := ioutil.ReadAll(io.LimitReader(r.Body, 1*megabytes))
+	body, err := ioutil.ReadAll(io.LimitReader(r.Body, 1*kilobyte))
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -61,5 +58,5 @@ func Echo(w http.ResponseWriter, r *http.Request) {
 	e.RemoteAddr = r.RemoteAddr
 	e.RequestURI = r.RequestURI
 
-	middleware.Respond(w, r, e)
+	middleware.RespondWithCode(http.StatusNotFound, w, r, e)
 }

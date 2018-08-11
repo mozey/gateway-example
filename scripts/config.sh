@@ -15,6 +15,10 @@ export APP_DEBUG=true
 cd ${APP_DIR}
 go build -ldflags "-X main.AppDir=${APP_DIR}" -o ./config ./cmd/config
 
+# Git hooks
+chmod u+x ${APP_DIR}/githooks/*.sh
+ln -s ${APP_DIR}/githooks/pre-commit.sh ${APP_DIR}/.git/hooks/pre-commit
+
 read -p "Reset config files (y)? " -n 1 -r
 echo ""
 echo ""
