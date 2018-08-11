@@ -6,10 +6,15 @@
 #
 # This script does not handle file names that contain spaces.
 
+# WARNING Do not `set -eu`, otherwise `GO_FILES=...` will always fail
+# and exit the script if no *.go files were changed
+
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null && pwd )"
 SCRIPT_NAME=$(basename -- "$0")
 echo "${SCRIPT_DIR}/${SCRIPT_NAME}"
 
+# Note that `gif diff` will not list un-staged files,
+# but this script run after staging with `git commit -a` flag?
 GO_FILES=$(git diff --cached --name-only --diff-filter=ACM | grep '\.go$')
 [ -z "${GO_FILES}" ] && exit 0
 
