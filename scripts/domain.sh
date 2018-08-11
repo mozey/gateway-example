@@ -123,11 +123,10 @@ then
     # Trying to delete an empty base path will error
     BASE_PATH="(none)"
 fi
-# TODO Filter on base path when checking if mapping exists
-PATH_MAPPINGS=$(aws apigateway get-base-path-mappings \
+CREATE_MAPPING=$(aws apigateway get-base-path-mappings \
 --domain-name ${APP_API_CUSTOM} | \
-jq ".items | length")
-if [ "${PATH_MAPPINGS}" = "0" ]
+jq ".items[] | select(.basePath == \"${BASE_PATH}.\") | .basePath")
+if [ "${CREATE_MAPPING}" = "" ]
 then
     echo "Create API path mapping"
     echo ""
@@ -139,7 +138,7 @@ then
     --region ${APP_REGION}
 fi
 
-APP_API_CUSTOM_ENDPOINT="https://${APP_API_CUSTOM}${APP_API_PATH}"
+APP_API_CUSTOM_ENDPOINT="https://${APP_API_CUSTOM}/${APP_API_PATH}"
 
 # ..............................................................................
 CREATE_CNAME=$(aws route53 list-resource-record-sets --hosted-zone-id ${APP_DNS_HOSTED_ZONE} | \

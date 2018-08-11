@@ -64,10 +64,10 @@ Call lambda endpoint
     http ${APP_API_ENDPOINT}/foo?foo=foo
     
 Add a custom domain to invoke the lambda fn via API gateway,
-all request methods and paths are forwarded to the lambda fn
+all request methods and paths matching the prefix are forwarded to the lambda fn
     
     ./config -env prod \
-    -key APP_API_PATH -value "" \
+    -key APP_API_PATH -value "v1" \
     -key APP_API_CUSTOM -value api.mozey.co \
     -key APP_API_DOMAIN -value mozey.co \
     -update
@@ -176,12 +176,12 @@ Test
 
 # Micro-service for a specific path? 
 
-Make `/books` call a different lambda function,
+Make base path `/v1-b` call a different lambda function,
 see [books-api](https://github.com/mozey/aws-lambda-go/tree/master/examples/books-api)
 
     ./config -env prod \
     -key APP_BOOKS_API_ID -value ${APP_BOOKS_API_ID} \
-    -key APP_BOOKS_BASE_PATH -value ${APP_BOOKS_BASE_PATH} \
+    -key APP_BOOKS_BASE_PATH -value "v1-b" \
     -key APP_BOOKS_STAGE_NAME -value ${APP_BOOKS_STAGE_NAME} \
     -update
     
@@ -194,11 +194,21 @@ see [books-api](https://github.com/mozey/aws-lambda-go/tree/master/examples/book
     --stage ${APP_BOOKS_STAGE_NAME} \
     --region ${APP_REGION}
     
-ConflictException:
-`Only one base path mapping is allowed if the base path is empty`,
-so each path must be explicitly mapped?
+List all path mappings for the custom domain
 
-TODO Better way to do this?
+    aws apigateway get-base-path-mappings --domain-name ${APP_API_CUSTOM}
+    
+Update config
+
+    ./config -env prod \
+    -key APP_BOOKS_ENDPOINT -value "https://${APP_API_CUSTOM}/${APP_BOOKS_BASE_PATH}" \
+    -update
+    
+    $(./config -env prod)
+
+Test
+
+    http ${APP_BOOKS_ENDPOINT}/books?isbn=978-1420931693
 
     
 # [apex/gateway](https://github.com/apex/gateway)

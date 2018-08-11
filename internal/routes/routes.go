@@ -7,11 +7,13 @@ import (
 	"github.com/mozey/gateway/internal/middleware"
 )
 
+// Route defines a route
 type Route struct {
 	Path        string
 	HandlerFunc http.HandlerFunc
 }
 
+// Routes array used to create a router
 type Routes []Route
 
 var routes = Routes{
@@ -20,10 +22,10 @@ var routes = Routes{
 	},
 
 	Route{
-		"/foo{ignore:.*}", controllers.Foo,
+		"/v1/foo{ignore:.*}", controllers.Foo,
 	},
 	Route{
-		"/bar{ignore:.*}",
+		"/v1/bar{ignore:.*}",
 		middleware.WithAuth(
 			middleware.Auth{}, http.HandlerFunc(controllers.Bar)),
 	},
@@ -34,7 +36,7 @@ var routes = Routes{
 	},
 }
 
-
+// NewRouter returns a new router instance
 func NewRouter() *mux.Router {
 	// StrictSlash must be false otherwise index is not loaded consistently
 	router := mux.NewRouter().StrictSlash(false)
