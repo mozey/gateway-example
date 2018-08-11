@@ -174,6 +174,33 @@ Test
     http localhost:${APP_PORT}
 
 
+# Micro-service for a specific path? 
+
+Make `/books` call a different lambda function,
+see [books-api](https://github.com/mozey/aws-lambda-go/tree/master/examples/books-api)
+
+    ./config -env prod \
+    -key APP_BOOKS_API_ID -value ${APP_BOOKS_API_ID} \
+    -key APP_BOOKS_BASE_PATH -value ${APP_BOOKS_BASE_PATH} \
+    -key APP_BOOKS_STAGE_NAME -value ${APP_BOOKS_STAGE_NAME} \
+    -update
+    
+    $(./config -env prod)
+    
+    aws apigateway create-base-path-mapping \
+    --base-path ${APP_BOOKS_BASE_PATH} \
+    --domain-name ${APP_API_CUSTOM} \
+    --rest-api-id ${APP_BOOKS_API_ID} \
+    --stage ${APP_BOOKS_STAGE_NAME} \
+    --region ${APP_REGION}
+    
+ConflictException:
+`Only one base path mapping is allowed if the base path is empty`,
+so each path must be explicitly mapped?
+
+TODO Better way to do this?
+
+    
 # [apex/gateway](https://github.com/apex/gateway)
 
 ...provides a drop-in replacement for net/http's ListenAndServe 
@@ -186,13 +213,11 @@ and [github here](https://github.com/golang-standards/project-layout)
 Use of gateway inspired by [aws-sam-golang-example](https://github.com/cpliakas/aws-sam-golang-example),
 but this example does not use sam local
 
-Use monolithic lambda fn (routing is done internal to the fn) by default, 
-see [Serverless API with Go and AWS Lambda](https://github.com/mozey/aws-lambda-go/tree/master/examples/books-api).
-Pass in an optional path prefix when creating the fn
+Use monolithic lambda fn (routing is done internal to the fn) by default 
 
 Use a [shared library](https://stackoverflow.com/a/35060357/639133) 
 if the lambda zip [size limit](https://docs.aws.amazon.com/lambda/latest/dg/limits.html)
-becomes an issue: "Each Lambda function receives an additional 512MB of 
+becomes an issue: "Each Lambda function receives an additional 512MB..." 
 
 
 # Caller id

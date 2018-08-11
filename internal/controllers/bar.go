@@ -14,3 +14,4 @@ func Bar(w http.ResponseWriter, r *http.Request) {
 	middleware.Respond(w, r,
 		middleware.ResponseMsg{Message: fmt.Sprintf("user = %v", user)})
 }
+

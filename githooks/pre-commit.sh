@@ -6,10 +6,6 @@
 #
 # This script does not handle file names that contain spaces.
 
-# Set (e) exit on error
-# Set (u) no-unset to exit on undefined variable
-set -eu
-
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null && pwd )"
 SCRIPT_NAME=$(basename -- "$0")
 echo "${SCRIPT_DIR}/${SCRIPT_NAME}"
