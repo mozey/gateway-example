@@ -8,8 +8,17 @@ set -eu
 # return code of the whole pipeline.
 bash -c 'set -o pipefail'
 
+E_BADARGS=100
+
 # Must fail with "unbound variable" if these are not set
 APP_DIR=${APP_DIR}
+AWS_PROFILE=${AWS_PROFILE}
+
+if [ "${AWS_PROFILE}" != "aws-local" ]
+then
+    echo "dev build must use local services"
+    exit ${E_BADARGS}
+fi
 
 echo "Building exe"
 cd ${APP_DIR}

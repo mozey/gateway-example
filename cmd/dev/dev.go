@@ -14,11 +14,13 @@ func main() {
 	log.SetFlags(log.Ldate | log.Ltime | log.LUTC | log.Lshortfile)
 
 	h := routes.NewRouter()
-	logutil.Debug("Using net/http")
 
 	port := os.Getenv("APP_PORT")
+	listen := fmt.Sprintf("localhost:%v", port)
 
-	log.Fatal(http.ListenAndServe(fmt.Sprintf(":%v", port),
+	logutil.Debugf("Listening on %v", listen)
+
+	log.Fatal(http.ListenAndServe(listen,
 		handlers.RecoveryHandler(
 			handlers.PrintRecoveryStack(true))(h)))
 }

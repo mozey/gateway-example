@@ -8,12 +8,17 @@ set -eu
 # return code of the whole pipeline.
 bash -c 'set -o pipefail'
 
+# Env
+GOPATH=${GOPATH}
 APP_DIR=${APP_DIR}
+export APP_DEBUG=true
 
 # Build config util
-export APP_DEBUG=true
-cd ${APP_DIR}
-go build -ldflags "-X main.AppDir=${APP_DIR}" -o ./config ./cmd/config
+go get github.com/mozey/config
+cd ${GOPATH}/src/github.com/mozey/config
+go build \
+-ldflags "-X main.AppDir=${APP_DIR}" \
+-o ${APP_DIR}/config ./cmd/config
 
 # Git hooks
 chmod u+x ${APP_DIR}/githooks/*.sh

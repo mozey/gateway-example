@@ -12,7 +12,8 @@ func main() {
 	log.SetFlags(log.Ldate | log.Ltime | log.LUTC | log.Lshortfile)
 
 	h := routes.NewRouter()
-	logutil.Debug("Using apex/gateway")
+
+	logutil.Debug("mozey-gateway main")
 
 	log.Fatal(gateway.ListenAndServe("",
 		handlers.RecoveryHandler()(h)))
