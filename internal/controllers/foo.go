@@ -10,7 +10,6 @@ import (
 
 // Foo route handler
 func Foo(w http.ResponseWriter, r *http.Request) {
-	logutil.Debug("Foo")
 	fooParam := r.URL.Query().Get("foo")
 	if fooParam == "" {
 		logutil.Debug("Missing foo")
@@ -19,7 +18,8 @@ func Foo(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if fooParam == "panic" {
-		// Pass in foo=panic to see the RecoveryHandler in action
+		//time.Sleep(1 * time.Second)
+		// Pass in foo=panic to see the middleware.RecoveryHandler in action
 		log.Panic("oops!")
 	}
 	middleware.Respond(

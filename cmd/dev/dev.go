@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"github.com/mozey/gateway/internal/routes"
 	"github.com/mozey/logutil"
-	"github.com/gorilla/handlers"
+	"github.com/mozey/gateway/internal/middleware"
 	"os"
 	"fmt"
 )
@@ -20,7 +20,7 @@ func main() {
 
 	logutil.Debugf("Listening on %v", listen)
 
+	middleware.RespondWithStack(true)
 	log.Fatal(http.ListenAndServe(listen,
-		handlers.RecoveryHandler(
-			handlers.PrintRecoveryStack(true))(h)))
+		middleware.RecoveryHandler(h)))
 }

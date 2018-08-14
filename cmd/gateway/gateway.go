@@ -5,7 +5,7 @@ import (
 	"github.com/apex/gateway"
 	"github.com/mozey/gateway/internal/routes"
 	"github.com/mozey/logutil"
-	"github.com/gorilla/handlers"
+	"github.com/mozey/gateway/internal/middleware"
 )
 
 func main() {
@@ -16,7 +16,7 @@ func main() {
 	logutil.Debug("mozey-gateway main")
 
 	log.Fatal(gateway.ListenAndServe("",
-		handlers.RecoveryHandler()(h)))
+		middleware.RecoveryHandler(h)))
 }
 
 

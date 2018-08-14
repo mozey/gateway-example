@@ -45,10 +45,10 @@ func Echo(w http.ResponseWriter, r *http.Request) {
 	e.Header = r.Header
 	body, err := ioutil.ReadAll(io.LimitReader(r.Body, 1*kilobyte))
 	if err != nil {
-		log.Fatal(err)
+		log.Panic(err)
 	}
 	if err := r.Body.Close(); err != nil {
-		log.Fatal(err)
+		log.Panic(err)
 	}
 	e.Body.String = string(body)
 	e.ContentLength = r.ContentLength

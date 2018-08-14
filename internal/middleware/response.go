@@ -20,7 +20,18 @@ const (
 
 // ResponseMsg is a simple example of a response message type
 type ResponseMsg struct {
-	Message string `json:"message"`
+	Message string   `json:"message"`
+}
+
+// ResponseStack is a response with a stack trace
+type ResponseStack struct {
+	Stack   []string `json:"stack"`
+}
+
+// ResponseMsgWithStack is a response message with a stack trace
+type ResponseWithStack struct {
+	Message string   `json:"message"`
+	ResponseStack
 }
 
 // Headers set by default for the response
@@ -34,6 +45,26 @@ func ResponseHeaders(inner http.Handler) http.Handler {
 	})
 }
 
+func ExecutionDurationSeconds(r *http.Request) string {
+	duration := r.Context().Value(HeaderExecutionDurationS)
+	if duration != nil {
+		// Inner handler has already called RespondWithCode
+		return duration.(string)
+	}
+	startRaw := r.Context().Value(ContextExecutionStart)
+	if startRaw != nil {
+		start, err := time.Parse(
+			ContextExecutionStartFormat, startRaw.(string))
+		if err == nil {
+			diff := time.Since(start)
+			return fmt.Sprintf("%v", diff.Seconds())
+		} else {
+			log.Print(err)
+		}
+	}
+	return ""
+}
+
 // Respond with StatusOK
 func Respond(w http.ResponseWriter, r *http.Request, msg interface{}) {
 	RespondWithCode(http.StatusOK, w, r, msg)
@@ -41,18 +72,8 @@ func Respond(w http.ResponseWriter, r *http.Request, msg interface{}) {
 
 // RespondWithCode specified
 func RespondWithCode(statusCode int, w http.ResponseWriter, r *http.Request, msg interface{}) {
-	startRaw := r.Context().Value(ContextExecutionStart)
-	if startRaw != nil {
-		start, err := time.Parse(
-			ContextExecutionStartFormat, startRaw.(string))
-		if err == nil {
-			diff := time.Since(start)
-			w.Header().Set(HeaderExecutionDurationS,
-				fmt.Sprintf("%v", diff.Seconds()))
-		} else {
-			log.Print(err)
-		}
-	}
+	duration := ExecutionDurationSeconds(r)
+	w.Header().Set(HeaderExecutionDurationS, duration)
 	w.WriteHeader(statusCode)
 	json.NewEncoder(w).Encode(msg)
 }

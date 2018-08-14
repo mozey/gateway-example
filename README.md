@@ -21,7 +21,7 @@ The dev config uses [aws-local](https://github.com/mozey/aws-local)
 
     export APP_DIR=$(pwd) && ./scripts/config.sh
     
-    $(./config)
+    eval "$(./config)"
     
 Print env
 
@@ -72,7 +72,7 @@ all request methods and paths matching the prefix are forwarded to the lambda fn
     -key APP_API_DOMAIN -value mozey.co \
     -update
     
-    $(./config -env prod) 
+    eval "$(./config -env prod)"
     
     ./scripts/domain.sh && $(./config -env prod)
     
@@ -91,7 +91,7 @@ Deploy to update the lambda fn
 
 # Delete lambda fn and API
 
-    $(./config -env prod) && ./scripts/reset.sh
+    eval "$(./config -env prod)" && ./scripts/reset.sh
 
 
 # Makefile
@@ -104,11 +104,11 @@ Install dependencies
 
 Run with live reload    
     
-    $(./config) && make dev
+    eval "$(./config)" && make dev
     
 Build and deploy lambda fn
 
-    $(./config -env prod) && make deploy
+    eval "$(./config -env prod)" && make deploy
     
 fswatch only `*.go` file in current dir,
 note that the $ sign must be escaped in the Makefile
@@ -153,7 +153,7 @@ Build container exe
 
     export APP_DIR=${GOPATH}/src/github.com/mozey/gateway
     
-    $(./config})
+    eval "$(./config)"
     
     ./scripts/build.container.sh
     
