@@ -22,7 +22,7 @@ go build \
 
 # Git hooks
 chmod u+x ${APP_DIR}/githooks/*.sh
-ln -s ${APP_DIR}/githooks/pre-commit.sh ${APP_DIR}/.git/hooks/pre-commit
+ln -sf ${APP_DIR}/githooks/pre-commit.sh ${APP_DIR}/.git/hooks/pre-commit
 
 read -p "Reset config files (y)? " -n 1 -r
 echo ""
