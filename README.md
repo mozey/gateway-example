@@ -56,7 +56,7 @@ Create lambda fn and API
     
 Call lambda endpoint
 
-    http ${APP_LAMBDA_BASE}/foo?foo=foo
+    http "${APP_LAMBDA_BASE}/v1/foo?foo=foo&api_key=123"
     
 Add a custom domain to invoke the lambda fn via API gateway,
 all request methods and paths matching the prefix are forwarded to the lambda fn
@@ -77,7 +77,7 @@ then run the script again to finish setup
     
 Call API (DNS may take some time to propagate)
 
-    http "${APP_API_BASE}/foo?foo=abc&api_key=123"
+    http "${APP_API_BASE}/foo?foo=foo&api_key=123"
     
 Deploy to update the lambda fn
     
