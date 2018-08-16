@@ -1,7 +1,7 @@
 {
     "APP_DEBUG": "true",
-    "APP_FN_HANDLER": "gateway.out",
-    "APP_FN_NAME": "mozey-gateway",
+    "APP_LAMBDA_HANDLER": "gateway.out",
+    "APP_LAMBDA_NAME": "mozey-gateway",
     "APP_REGION": "eu-west-2",
     "AWS_PROFILE": "YOUR_PROFILE_HERE"
 }

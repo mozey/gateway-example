@@ -2,26 +2,25 @@ package controllers
 
 import (
 	"net/http"
-	"github.com/mozey/logutil"
 	"log"
-	"github.com/mozey/gateway/internal/middleware"
 	"fmt"
+	"github.com/labstack/echo"
 )
 
 // Foo route handler
-func Foo(w http.ResponseWriter, r *http.Request) {
-	fooParam := r.URL.Query().Get("foo")
-	if fooParam == "" {
-		logutil.Debug("Missing foo")
-		msg := middleware.ResponseMsg{Message: "Missing foo"}
-		middleware.RespondWithCode(http.StatusBadRequest, w, r, msg)
-		return
+func Foo(c echo.Context) error {
+	foo := c.QueryParam("foo")
+	if foo == "" {
+		return echo.NewHTTPError(
+			http.StatusUnauthorized,
+			"missing foo in the query string")
 	}
-	if fooParam == "panic" {
+	if foo == "panic" {
 		//time.Sleep(1 * time.Second)
 		// Pass in foo=panic to see the middleware.RecoveryHandler in action
 		log.Panic("oops!")
 	}
-	middleware.Respond(
-		w, r, middleware.ResponseMsg{Message: fmt.Sprintf("foo: %v", fooParam)})
+	resp := Response{
+		Message: fmt.Sprintf("foo: %v user: %v", foo, c.Get("user"))}
+	return c.JSON(http.StatusOK, resp)
 }

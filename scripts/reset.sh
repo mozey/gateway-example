@@ -9,42 +9,42 @@ set -eu
 bash -c 'set -o pipefail'
 
 APP_DIR=${APP_DIR}
-APP_FN_NAME=${APP_FN_NAME}
-APP_API_CUSTOM=${APP_API_CUSTOM}
+APP_LAMBDA_NAME=${APP_LAMBDA_NAME}
+APP_API_SUBDOMAIN=${APP_API_SUBDOMAIN}
 APP_API_PATH=${APP_API_PATH}
 
-read -p "Delete lambda fn and API ${APP_FN_NAME} (y)? " -n 1 -r
+read -p "Delete lambda fn and API ${APP_LAMBDA_NAME} (y)? " -n 1 -r
 echo ""
 echo ""
 if [[ ${REPLY} =~ ^[Yy]$ ]]
 then
     # Other managed/inline policies to detach/delete?
-    APP_FN_POLICY_ARN=$(aws iam list-attached-role-policies \
-    --role-name ${APP_FN_NAME} | \
+    APP_LAMBDA_POLICY_ARN=$(aws iam list-attached-role-policies \
+    --role-name ${APP_LAMBDA_NAME} | \
     jq -r ".AttachedPolicies[] | select(.PolicyName == \"AWSLambdaBasicExecutionRole\") | .PolicyArn") \
-    || APP_FN_POLICY_ARN=""
-    if [ "${APP_FN_POLICY_ARN}" != "" ]
+    || APP_LAMBDA_POLICY_ARN=""
+    if [ "${APP_LAMBDA_POLICY_ARN}" != "" ]
     then
-        echo "Detaching policy ${APP_FN_POLICY_ARN}"
-        aws iam detach-role-policy --role-name ${APP_FN_NAME} \
-        --policy-arn ${APP_FN_POLICY_ARN}
+        echo "Detaching policy ${APP_LAMBDA_POLICY_ARN}"
+        aws iam detach-role-policy --role-name ${APP_LAMBDA_NAME} \
+        --policy-arn ${APP_LAMBDA_POLICY_ARN}
     fi
 
     DELETE_ROLE=1
-    aws iam get-role --role-name ${APP_FN_NAME} > /dev/null || DELETE_ROLE=0
+    aws iam get-role --role-name ${APP_LAMBDA_NAME} > /dev/null || DELETE_ROLE=0
     if [ ${DELETE_ROLE} -eq 1 ]
     then
         echo "Deleting IAM role"
-        aws iam delete-role --role-name ${APP_FN_NAME}
+        aws iam delete-role --role-name ${APP_LAMBDA_NAME}
     fi
 
     DELETE_FN=1
-    aws lambda get-function --function-name ${APP_FN_NAME} > /dev/null \
+    aws lambda get-function --function-name ${APP_LAMBDA_NAME} > /dev/null \
     || DELETE_FN=0
     if [ ${DELETE_FN} -eq 1 ]
     then
         echo "Deleting lambda fn"
-        aws lambda delete-function --function-name ${APP_FN_NAME}
+        aws lambda delete-function --function-name ${APP_LAMBDA_NAME}
     fi
 
     BASE_PATH=${APP_API_PATH}
@@ -54,17 +54,17 @@ then
         BASE_PATH="(none)"
     fi
     DELETE_BASE_PATH=1
-    aws apigateway get-base-path-mapping --domain-name ${APP_API_CUSTOM} \
+    aws apigateway get-base-path-mapping --domain-name ${APP_API_SUBDOMAIN} \
     --base-path ${BASE_PATH} > /dev/null \
     || DELETE_BASE_PATH=0
     if [ ${DELETE_FN} -eq 1 ]
     then
         aws apigateway delete-base-path-mapping \
-        --domain-name ${APP_API_CUSTOM} --base-path ${BASE_PATH}
+        --domain-name ${APP_API_SUBDOMAIN} --base-path ${BASE_PATH}
     fi
 
     APP_API=$(aws apigateway get-rest-apis | \
-    jq -r ".items[]  | select(.name == \"${APP_FN_NAME}\") | .id") \
+    jq -r ".items[]  | select(.name == \"${APP_LAMBDA_NAME}\") | .id") \
     || APP_API=""
     if [ "${APP_API}" != "" ]
     then

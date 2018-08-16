@@ -1,37 +1,40 @@
 package middleware
 
 import (
+	"github.com/labstack/echo"
+	"github.com/labstack/echo/middleware"
 	"net/http"
-	"context"
 	"fmt"
 )
 
-const (
-	ContextUserID = "session"
-)
-
-type Auth struct {}
-
-func (a *Auth) Authorise(key string) (userID string, err error) {
-	if key == "123" {
-		return "joe", nil
-	}
-	return "", fmt.Errorf("invalid key: %v", key)
+type Response struct {
+	Message string
 }
 
-func WithAuth(a Auth, inner http.Handler) http.HandlerFunc {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		key := r.URL.Query().Get("key")
+func Validator(apiKey string, c echo.Context) (bool, error) {
+	if apiKey == "123" {
+		c.Set("user", "joe")
+		return true, nil
+	}
+	return false, echo.NewHTTPError(
+		http.StatusUnauthorized, fmt.Sprintf("invalid api_key"))
+}
 
-		userID, err := a.Authorise(key)
-		if err != nil {
-			RespondWithCode(http.StatusUnauthorized,
-				w, r, ResponseMsg{Message: err.Error()})
-			return
-		}
+func Skipper(c echo.Context) bool {
+	path := c.Path()
 
-		ctx := context.WithValue(r.Context(), ContextUserID, userID)
-		inner.ServeHTTP(w, r.WithContext(ctx))
+	if path == "/v1" ||
+		path == "/v1/bar" {
+		// These endpoints do not require api_key
+		return true
+	}
+	return false
+}
+
+func Auth() echo.MiddlewareFunc {
+	return middleware.KeyAuthWithConfig(middleware.KeyAuthConfig{
+		KeyLookup: "query:api_key",
+		Validator: Validator,
+		Skipper:   Skipper,
 	})
 }
-

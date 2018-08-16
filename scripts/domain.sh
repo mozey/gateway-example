@@ -12,9 +12,9 @@ E_BADARGS=100
 
 # Must fail with "unbound variable" if these are not set
 APP_DIR=${APP_DIR}
-APP_FN_NAME=${APP_FN_NAME}
+APP_LAMBDA_NAME=${APP_LAMBDA_NAME}
 APP_API_PATH=${APP_API_PATH}
-APP_API_CUSTOM=${APP_API_CUSTOM}
+APP_API_SUBDOMAIN=${APP_API_SUBDOMAIN}
 APP_API_DOMAIN=${APP_API_DOMAIN}
 APP_REGION=${APP_REGION}
 APP_API=${APP_API}
@@ -26,16 +26,16 @@ APP_API_STAGE_NAME=${APP_API_STAGE_NAME}
 CERT_REGION=us-east-1
 
 APP_CERT_ARN=$(aws acm list-certificates --region ${CERT_REGION} | \
-jq -r ".CertificateSummaryList[] | select(.DomainName == \"${APP_API_CUSTOM}\") | .CertificateArn")
+jq -r ".CertificateSummaryList[] | select(.DomainName == \"${APP_API_SUBDOMAIN}\") | .CertificateArn")
 if [ "${APP_CERT_ARN}" = "" ]
 then
-    echo "Requesting cert for ${APP_API_CUSTOM}"
+    echo "Requesting cert for ${APP_API_SUBDOMAIN}"
     echo ""
     aws acm request-certificate \
     --region ${CERT_REGION} \
-    --domain-name ${APP_API_CUSTOM} --validation-method DNS
+    --domain-name ${APP_API_SUBDOMAIN} --validation-method DNS
     APP_CERT_ARN=$(aws acm list-certificates --region ${CERT_REGION} | \
-    jq -r ".CertificateSummaryList[] | select(.DomainName == \"${APP_API_CUSTOM}\") | .CertificateArn")
+    jq -r ".CertificateSummaryList[] | select(.DomainName == \"${APP_API_SUBDOMAIN}\") | .CertificateArn")
 fi
 
 # ..............................................................................
@@ -100,19 +100,19 @@ echo "Certificate is verified"
 
 # ..............................................................................
 CREATE_API_DOMAIN=0
-aws apigateway get-domain-name --domain-name ${APP_API_CUSTOM} > /dev/null \
+aws apigateway get-domain-name --domain-name ${APP_API_SUBDOMAIN} > /dev/null \
 || CREATE_API_DOMAIN=1
 if [ ${CREATE_API_DOMAIN} -eq 1 ]
 then
     echo "Create API domain"
     echo ""
     aws apigateway create-domain-name \
-    --domain-name ${APP_API_CUSTOM} \
-    --certificate-name ${APP_API_CUSTOM} \
+    --domain-name ${APP_API_SUBDOMAIN} \
+    --certificate-name ${APP_API_SUBDOMAIN} \
     --region ${APP_REGION} \
     --certificate-arn ${APP_CERT_ARN}
     APP_API_TARGET=$(aws apigateway get-domain-name \
-    --domain-name ${APP_API_CUSTOM} | \
+    --domain-name ${APP_API_SUBDOMAIN} | \
     jq -r .distributionDomainName)
 fi
 
@@ -124,7 +124,7 @@ then
     BASE_PATH="(none)"
 fi
 CREATE_MAPPING=$(aws apigateway get-base-path-mappings \
---domain-name ${APP_API_CUSTOM} | \
+--domain-name ${APP_API_SUBDOMAIN} | \
 jq ".items[] | select(.basePath == \"${BASE_PATH}.\") | .basePath")
 if [ "${CREATE_MAPPING}" = "" ]
 then
@@ -132,29 +132,29 @@ then
     echo ""
     aws apigateway create-base-path-mapping \
     --base-path ${BASE_PATH} \
-    --domain-name ${APP_API_CUSTOM} \
+    --domain-name ${APP_API_SUBDOMAIN} \
     --rest-api-id ${APP_API} \
     --stage ${APP_API_STAGE_NAME} \
     --region ${APP_REGION}
 fi
 
-APP_API_CUSTOM_ENDPOINT="https://${APP_API_CUSTOM}/${APP_API_PATH}"
+APP_API_BASE="https://${APP_API_SUBDOMAIN}/${APP_API_PATH}"
 
 # ..............................................................................
 CREATE_CNAME=$(aws route53 list-resource-record-sets --hosted-zone-id ${APP_DNS_HOSTED_ZONE} | \
-jq -r ".ResourceRecordSets[] | select(.Name == \"${APP_API_CUSTOM}.\") | .Name")
+jq -r ".ResourceRecordSets[] | select(.Name == \"${APP_API_SUBDOMAIN}.\") | .Name")
 if [ "${CREATE_CNAME}" = "" ]
 then
-    echo "Creating CNAME record for ${APP_API_CUSTOM}"
+    echo "Creating CNAME record for ${APP_API_SUBDOMAIN}"
     echo ""
     echo "
     {
-        \"Comment\": \"Custom domain for lambda fn ${APP_FN_NAME}\",
+        \"Comment\": \"Custom domain for lambda fn ${APP_LAMBDA_NAME}\",
         \"Changes\": [
             {
                 \"Action\": \"CREATE\",
                 \"ResourceRecordSet\": {
-                    \"Name\": \"${APP_API_CUSTOM}\",
+                    \"Name\": \"${APP_API_SUBDOMAIN}\",
                     \"Type\": \"CNAME\",
                     \"TTL\": 300,
                     \"ResourceRecords\": [
@@ -175,7 +175,7 @@ fi
 
 ${APP_DIR}/config -env prod \
 -key "APP_CERT_ARN" -value "${APP_CERT_ARN}" \
--key "APP_API_CUSTOM_ENDPOINT" -value "${APP_API_CUSTOM_ENDPOINT}" \
+-key "APP_API_BASE" -value "${APP_API_BASE}" \
 -key "APP_DNS_HOSTED_ZONE" -value "${APP_DNS_HOSTED_ZONE}" \
 -update
 

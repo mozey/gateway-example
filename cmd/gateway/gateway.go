@@ -1,24 +1,14 @@
 package main
 
 import (
-	"log"
-	"github.com/apex/gateway"
 	"github.com/mozey/gateway/internal/routes"
-	"github.com/mozey/logutil"
-	"github.com/mozey/gateway/internal/middleware"
+	"github.com/mozey/gateway-echo"
 )
 
 func main() {
-	log.SetFlags(log.Ldate | log.Ltime | log.LUTC | log.Lshortfile)
-
-	h := routes.NewRouter()
-
-	logutil.Debug("mozey-gateway main")
-
-	log.Fatal(gateway.ListenAndServe("",
-		middleware.RecoveryHandler(h)))
+	// Start server
+	e := routes.CreateMux()
+	// TODO Is this the right way to use echo with apex/gateway?
+	// https://forum.labstack.com/t/is-echo-v3-compatible-with-http-handlerfunc/523
+	e.Logger.Fatal(gateway.Start(e))
 }
-
-
-
-

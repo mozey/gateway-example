@@ -10,14 +10,14 @@ bash -c 'set -o pipefail'
 
 # Must fail with "unbound variable" if these are not set
 APP_DIR=${APP_DIR}
-APP_FN_HANDLER=${APP_FN_HANDLER}
+APP_LAMBDA_HANDLER=${APP_LAMBDA_HANDLER}
 
 mkdir -p ${APP_DIR}/build
 
 echo "Building exe"
 cd ${APP_DIR}
 env GOOS=linux GOARCH=amd64 go build \
--o build/${APP_FN_HANDLER} \
+-o build/${APP_LAMBDA_HANDLER} \
 ./cmd/gateway
 
 echo "Delete old build"
@@ -27,7 +27,7 @@ NAME="main${RELEASE}.zip"
 rm -f ${APP_DIR}/build/${NAME}
 
 echo "Zip new build"
-zip -j ${APP_DIR}/build/${NAME} ${APP_DIR}/build/${APP_FN_HANDLER}
+zip -j ${APP_DIR}/build/${NAME} ${APP_DIR}/build/${APP_LAMBDA_HANDLER}
 # Add more build artifacts here...
 
 echo "List zip contents"

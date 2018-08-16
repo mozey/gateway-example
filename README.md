@@ -34,13 +34,8 @@ Run dev server
 Test
     
     http localhost:${APP_PORT}
-    http "localhost:${APP_PORT}/foo?foo=asdf"
-    http "localhost:${APP_PORT}/foo?foo=panic"
-    http "localhost:${APP_PORT}/bar?key=xxx"
-    http "localhost:${APP_PORT}/bar?key=123"
-    http "localhost:${APP_PORT}/echo_if_no_match"
-    
-    
+
+
 # Create lambda fn and API
 
 Clear env
@@ -61,14 +56,14 @@ Create lambda fn and API
     
 Call lambda endpoint
 
-    http ${APP_API_ENDPOINT}/foo?foo=foo
+    http ${APP_LAMBDA_BASE}/foo?foo=foo
     
 Add a custom domain to invoke the lambda fn via API gateway,
 all request methods and paths matching the prefix are forwarded to the lambda fn
     
     ./config -env prod \
     -key APP_API_PATH -value "v1" \
-    -key APP_API_CUSTOM -value api.mozey.co \
+    -key APP_API_SUBDOMAIN -value api.mozey.co \
     -key APP_API_DOMAIN -value mozey.co \
     -update
     
@@ -82,7 +77,7 @@ then run the script again to finish setup
     
 Call API (DNS may take some time to propagate)
 
-    http ${APP_API_CUSTOM_ENDPOINT}/foo?foo=foo
+    http "${APP_API_BASE}/foo?foo=abc&api_key=123"
     
 Deploy to update the lambda fn
     
@@ -180,7 +175,7 @@ Make base path `/v1-b` call a different lambda function,
 see [books-api](https://github.com/mozey/aws-lambda-go/tree/master/examples/books-api)
 
     ./config -env prod \
-    -key APP_BOOKS_API_ID -value ${APP_BOOKS_API_ID} \
+    -key APP_BOOKS_API -value ${APP_BOOKS_API} \
     -key APP_BOOKS_BASE_PATH -value "v1-b" \
     -key APP_BOOKS_STAGE_NAME -value ${APP_BOOKS_STAGE_NAME} \
     -update
@@ -189,26 +184,26 @@ see [books-api](https://github.com/mozey/aws-lambda-go/tree/master/examples/book
     
     aws apigateway create-base-path-mapping \
     --base-path ${APP_BOOKS_BASE_PATH} \
-    --domain-name ${APP_API_CUSTOM} \
-    --rest-api-id ${APP_BOOKS_API_ID} \
+    --domain-name ${APP_API_SUBDOMAIN} \
+    --rest-api-id ${APP_BOOKS_API} \
     --stage ${APP_BOOKS_STAGE_NAME} \
     --region ${APP_REGION}
     
 List all path mappings for the custom domain
 
-    aws apigateway get-base-path-mappings --domain-name ${APP_API_CUSTOM}
+    aws apigateway get-base-path-mappings --domain-name ${APP_API_SUBDOMAIN}
     
 Update config
 
     ./config -env prod \
-    -key APP_BOOKS_ENDPOINT -value "https://${APP_API_CUSTOM}/${APP_BOOKS_BASE_PATH}" \
+    -key APP_BOOKS_BASE -value "https://${APP_API_SUBDOMAIN}/${APP_BOOKS_BASE_PATH}" \
     -update
     
     $(./config -env prod)
 
 Test
 
-    http ${APP_BOOKS_ENDPOINT}/books?isbn=978-1420931693
+    http ${APP_BOOKS_BASE}/books?isbn=978-1420931693
 
     
 # [apex/gateway](https://github.com/apex/gateway)

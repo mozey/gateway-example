@@ -4,10 +4,10 @@ import (
 	"testing"
 	"net/http"
 	"net/http/httptest"
-	"github.com/stretchr/testify/require"
-	"github.com/mozey/gateway/internal/middleware"
-	"github.com/mozey/logutil"
 	"net/http/httputil"
+	"github.com/stretchr/testify/require"
+	"github.com/labstack/echo"
+	"fmt"
 )
 
 func TestIndex(t *testing.T) {
@@ -18,16 +18,16 @@ func TestIndex(t *testing.T) {
 	}
 
 	// Record handler response
-	rr := httptest.NewRecorder()
-	var handler http.Handler
-	handler = http.HandlerFunc(Index)
-	handler = middleware.ResponseHeaders(handler)
-	handler.ServeHTTP(rr, req)
+	rec := httptest.NewRecorder()
+	e := echo.New()
+	c := e.NewContext(req, rec)
+	Index(c)
 
 	// Verify response
-	dump, err := httputil.DumpResponse(rr.Result(), true)
+	dump, err := httputil.DumpResponse(rec.Result(), true)
 	require.NoError(t, err)
-	logutil.Debug(string(dump)) // Print raw response
-	require.Equal(t, rr.Code, http.StatusOK, "invalid status code")
+	// TODO Why is log not printed with -v flag?
+	//logutil.Debug(string(dump)) // Print raw response
+	fmt.Println(string(dump))
+	require.Equal(t, rec.Code, http.StatusOK, "invalid status code")
 }
-

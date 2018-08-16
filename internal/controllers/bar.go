@@ -3,13 +3,12 @@ package controllers
 import (
 	"net/http"
 	"fmt"
-	"github.com/mozey/gateway/internal/middleware"
+	"github.com/labstack/echo"
 )
 
 // Bar route handler
-func Bar(w http.ResponseWriter, r *http.Request) {
-	user := r.Context().Value(middleware.ContextUserID)
-	middleware.Respond(w, r,
-		middleware.ResponseMsg{Message: fmt.Sprintf("user = %v", user)})
+func Bar(c echo.Context) error {
+	resp := Response{Message: fmt.Sprintf("no api_key required")}
+	return c.JSON(http.StatusOK, resp)
 }
 
