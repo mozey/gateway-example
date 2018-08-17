@@ -25,7 +25,8 @@ func Foo(c echo.Context) error {
 		conf := config.Refresh()
 		resp := Response{
 			Message: fmt.Sprintf(
-				"conf.Timestamp: %v conf.Foo: %v", conf.Timestamp, conf.Foo)}
+				"conf.Timestamp: %v conf.Debug: %v",
+				conf.Timestamp, conf.Debug)}
 		return c.JSON(http.StatusOK, resp)
 	}
 
