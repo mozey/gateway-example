@@ -6,6 +6,8 @@ import (
 	"github.com/mozey/gateway/internal/routes"
 )
 
+// TODO Swagger annotations
+// https://github.com/swaggo/echo-swagger
 func main() {
 	port := os.Getenv("APP_PORT")
 	listen := fmt.Sprintf("localhost:%v", port)
@@ -13,6 +15,5 @@ func main() {
 	e := routes.CreateMux()
 	debug := os.Getenv("APP_DEBUG")
 	e.Debug = debug == "true"
-	fmt.Println("Debug", e.Debug)
 	e.Logger.Fatal(e.Start(listen))
 }

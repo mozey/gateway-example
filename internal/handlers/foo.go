@@ -5,6 +5,7 @@ import (
 	"log"
 	"fmt"
 	"github.com/labstack/echo"
+	"github.com/mozey/gateway/internal/config"
 )
 
 // Foo route handler
@@ -20,6 +21,15 @@ func Foo(c echo.Context) error {
 		// Pass in foo=panic to see the middleware.RecoveryHandler in action
 		log.Panic("oops!")
 	}
+	if foo == "config" {
+		conf := config.Refresh()
+		resp := Response{
+			Message: fmt.Sprintf(
+				"conf.Timestamp: %v conf.Foo: %v", conf.Timestamp, conf.Foo)}
+		return c.JSON(http.StatusOK, resp)
+	}
+
+	// Auth middleware sets "user" on the echo context
 	resp := Response{
 		Message: fmt.Sprintf("foo: %v user: %v", foo, c.Get("user"))}
 	return c.JSON(http.StatusOK, resp)
