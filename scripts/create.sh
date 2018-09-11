@@ -12,8 +12,19 @@ bash -c 'set -o pipefail'
 APP_DIR=${APP_DIR}
 APP_LAMBDA_NAME=${APP_LAMBDA_NAME}
 APP_LAMBDA_HANDLER=${APP_LAMBDA_HANDLER}
-AWS_PROFILE=${AWS_PROFILE}
 APP_REGION=${APP_REGION}
+AWS_PROFILE=${AWS_PROFILE}
+
+# Confirm profile
+read -p "AWS_PROFILE = ${AWS_PROFILE} continue (y)? " -n 1 -r
+echo ""
+if [[ ${REPLY} =~ ^[Yy]$ ]]
+then
+    :
+else
+    echo "Abort"
+    exit 1
+fi
 
 # Lambda fn.....................................................................
 
@@ -112,8 +123,7 @@ ${APP_DIR}/config -env prod \
 -key "APP_REGION" -value "${APP_REGION}" \
 -key "APP_LAMBDA_PERM" -value "${APP_LAMBDA_PERM}" \
 -key "APP_API_STAGE_NAME" -value "${APP_API_STAGE_NAME}" \
--key "AWS_PROFILE" -value "${AWS_PROFILE}" \
--update
+-key "AWS_PROFILE" -value "${AWS_PROFILE}"
 
 echo "Done"
 

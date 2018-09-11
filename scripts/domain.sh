@@ -8,8 +8,6 @@ set -eu
 # return code of the whole pipeline.
 bash -c 'set -o pipefail'
 
-E_BADARGS=100
-
 # Must fail with "unbound variable" if these are not set
 APP_DIR=${APP_DIR}
 APP_LAMBDA_NAME=${APP_LAMBDA_NAME}
@@ -19,6 +17,19 @@ APP_API_DOMAIN=${APP_API_DOMAIN}
 APP_REGION=${APP_REGION}
 APP_API=${APP_API}
 APP_API_STAGE_NAME=${APP_API_STAGE_NAME}
+AWS_PROFILE=${AWS_PROFILE}
+
+# Confirm profile
+read -p "AWS_PROFILE = ${AWS_PROFILE} continue (y)? " -n 1 -r
+echo ""
+if [[ ${REPLY} =~ ^[Yy]$ ]]
+then
+    :
+else
+    echo "Abort"
+    exit 1
+fi
+
 
 # ..............................................................................
 # WARNING 2018-08-05 `aws apigateway create-domain-name` will fail with
@@ -50,7 +61,7 @@ jq -r ".HostedZones[] | select(.Name == \"${APP_API_DOMAIN}.\") | .Id")
 if [ "${APP_DNS_HOSTED_ZONE}" = "" ]
 then
     echo "Invalid APP_API_DOMAIN: no matching hosted zones"
-    exit ${E_BADARGS}
+    exit 1
 fi
 
 CREATE_CNAME=$(aws route53 list-resource-record-sets --hosted-zone-id ${APP_DNS_HOSTED_ZONE} | \
@@ -94,7 +105,7 @@ then
     echo "Invalid APP_CERT_STATUS ${APP_CERT_STATUS}"
     echo "It might take a while for validation to complete"
     echo ""
-    exit ${E_BADARGS}
+    exit 1
 fi
 echo "Certificate is verified"
 
@@ -118,15 +129,15 @@ fi
 
 ## ..............................................................................
 BASE_PATH=${APP_API_PATH}
-if [ "${APP_API_PATH}" = "" ]
+if [ "${BASE_PATH}" = "" ]
 then
     # Trying to delete an empty base path will error
     BASE_PATH="(none)"
 fi
-CREATE_MAPPING=$(aws apigateway get-base-path-mappings \
+EXISTING_BASE_PATH=$(aws apigateway get-base-path-mappings \
 --domain-name ${APP_API_SUBDOMAIN} | \
-jq ".items[] | select(.basePath == \"${BASE_PATH}.\") | .basePath")
-if [ "${CREATE_MAPPING}" = "" ]
+jq ".items[] | select(.basePath == \"${BASE_PATH}\") | .basePath")
+if [ "${EXISTING_BASE_PATH}" = "" ]
 then
     echo "Create API path mapping"
     echo ""
@@ -141,9 +152,9 @@ fi
 APP_API_BASE="https://${APP_API_SUBDOMAIN}/${APP_API_PATH}"
 
 # ..............................................................................
-CREATE_CNAME=$(aws route53 list-resource-record-sets --hosted-zone-id ${APP_DNS_HOSTED_ZONE} | \
+EXISTING_CNAME=$(aws route53 list-resource-record-sets --hosted-zone-id ${APP_DNS_HOSTED_ZONE} | \
 jq -r ".ResourceRecordSets[] | select(.Name == \"${APP_API_SUBDOMAIN}.\") | .Name")
-if [ "${CREATE_CNAME}" = "" ]
+if [ "${EXISTING_CNAME}" = "" ]
 then
     echo "Creating CNAME record for ${APP_API_SUBDOMAIN}"
     echo ""
@@ -176,6 +187,5 @@ fi
 ${APP_DIR}/config -env prod \
 -key "APP_CERT_ARN" -value "${APP_CERT_ARN}" \
 -key "APP_API_BASE" -value "${APP_API_BASE}" \
--key "APP_DNS_HOSTED_ZONE" -value "${APP_DNS_HOSTED_ZONE}" \
--update
+-key "APP_DNS_HOSTED_ZONE" -value "${APP_DNS_HOSTED_ZONE}"
 

@@ -22,11 +22,9 @@ func Foo(c echo.Context) error {
 		log.Panic("oops!")
 	}
 	if foo == "config" {
-		conf := config.Refresh()
+		conf := config.New()
 		resp := Response{
-			Message: fmt.Sprintf(
-				"conf.Timestamp: %v conf.Debug: %v",
-				conf.Timestamp, conf.Debug)}
+			Message: fmt.Sprintf("conf.Debug %v", conf.Debug)}
 		return c.JSON(http.StatusOK, resp)
 	}
 

@@ -3,11 +3,12 @@
 package config
 
 import (
+	"encoding/json"
+	"fmt"
+	"io/ioutil"
 	"os"
+	"path"
 )
-
-// APP_TIMESTAMP
-var timestamp string
 
 // APP_ACCOUNT
 var account string
@@ -87,9 +88,8 @@ var region string
 // AWS_PROFILE
 var awsProfile string
 
+// Config fields correspond to config file keys less the prefix
 type Config struct {
-	Timestamp string // APP_TIMESTAMP
-
 	Account         string // APP_ACCOUNT
 	Api             string // APP_API
 	ApiBase         string // APP_API_BASE
@@ -118,200 +118,278 @@ type Config struct {
 	AwsProfile      string // AWS_PROFILE
 }
 
-var conf *Config
-
-// New creates an instance of Config,
-// fields are set from private package vars or OS env.
-// For dev the config is read from env.
-// The prod build must be compiled with ldflags to set the package vars.
-// OS env vars will override ldflags if set.
-// Config fields correspond to the config file keys less the prefix.
-// Use https://github.com/mozey/config to manage the JSON config file
+// New creates an instance of Config.
+// Build with ldflags to set the package vars.
+// Env overrides package vars.
+// Fields correspond to the config file keys less the prefix.
+// The config file must have a flat structure
 func New() *Config {
-	var v string
+	conf := &Config{}
+	SetVars(conf)
+	SetEnv(conf)
+	return conf
+}
 
-	v = os.Getenv("APP_TIMESTAMP")
-	if v != "" {
-		timestamp = v
+// SetVars sets non-empty package vars on Config
+func SetVars(conf *Config) {
+
+	if account != "" {
+		conf.Account = account
 	}
+
+	if api != "" {
+		conf.Api = api
+	}
+
+	if apiBase != "" {
+		conf.ApiBase = apiBase
+	}
+
+	if apiDomain != "" {
+		conf.ApiDomain = apiDomain
+	}
+
+	if apiPath != "" {
+		conf.ApiPath = apiPath
+	}
+
+	if apiProxy != "" {
+		conf.ApiProxy = apiProxy
+	}
+
+	if apiRoot != "" {
+		conf.ApiRoot = apiRoot
+	}
+
+	if apiStageName != "" {
+		conf.ApiStageName = apiStageName
+	}
+
+	if apiSubdomain != "" {
+		conf.ApiSubdomain = apiSubdomain
+	}
+
+	if booksApi != "" {
+		conf.BooksApi = booksApi
+	}
+
+	if booksBase != "" {
+		conf.BooksBase = booksBase
+	}
+
+	if booksBasePath != "" {
+		conf.BooksBasePath = booksBasePath
+	}
+
+	if booksStageName != "" {
+		conf.BooksStageName = booksStageName
+	}
+
+	if certArn != "" {
+		conf.CertArn = certArn
+	}
+
+	if debug != "" {
+		conf.Debug = debug
+	}
+
+	if dir != "" {
+		conf.Dir = dir
+	}
+
+	if dnsHostedZone != "" {
+		conf.DnsHostedZone = dnsHostedZone
+	}
+
+	if lambdaArn != "" {
+		conf.LambdaArn = lambdaArn
+	}
+
+	if lambdaBase != "" {
+		conf.LambdaBase = lambdaBase
+	}
+
+	if lambdaHandler != "" {
+		conf.LambdaHandler = lambdaHandler
+	}
+
+	if lambdaName != "" {
+		conf.LambdaName = lambdaName
+	}
+
+	if lambdaPerm != "" {
+		conf.LambdaPerm = lambdaPerm
+	}
+
+	if lambdaPolicyArn != "" {
+		conf.LambdaPolicyArn = lambdaPolicyArn
+	}
+
+	if lambdaRoleArn != "" {
+		conf.LambdaRoleArn = lambdaRoleArn
+	}
+
+	if region != "" {
+		conf.Region = region
+	}
+
+	if awsProfile != "" {
+		conf.AwsProfile = awsProfile
+	}
+
+}
+
+// SetEnv sets non-empty env vars on Config
+func SetEnv(conf *Config) {
+	var v string
 
 	v = os.Getenv("APP_ACCOUNT")
 	if v != "" {
-		account = v
+		conf.Account = v
 	}
 
 	v = os.Getenv("APP_API")
 	if v != "" {
-		api = v
+		conf.Api = v
 	}
 
 	v = os.Getenv("APP_API_BASE")
 	if v != "" {
-		apiBase = v
+		conf.ApiBase = v
 	}
 
 	v = os.Getenv("APP_API_DOMAIN")
 	if v != "" {
-		apiDomain = v
+		conf.ApiDomain = v
 	}
 
 	v = os.Getenv("APP_API_PATH")
 	if v != "" {
-		apiPath = v
+		conf.ApiPath = v
 	}
 
 	v = os.Getenv("APP_API_PROXY")
 	if v != "" {
-		apiProxy = v
+		conf.ApiProxy = v
 	}
 
 	v = os.Getenv("APP_API_ROOT")
 	if v != "" {
-		apiRoot = v
+		conf.ApiRoot = v
 	}
 
 	v = os.Getenv("APP_API_STAGE_NAME")
 	if v != "" {
-		apiStageName = v
+		conf.ApiStageName = v
 	}
 
 	v = os.Getenv("APP_API_SUBDOMAIN")
 	if v != "" {
-		apiSubdomain = v
+		conf.ApiSubdomain = v
 	}
 
 	v = os.Getenv("APP_BOOKS_API")
 	if v != "" {
-		booksApi = v
+		conf.BooksApi = v
 	}
 
 	v = os.Getenv("APP_BOOKS_BASE")
 	if v != "" {
-		booksBase = v
+		conf.BooksBase = v
 	}
 
 	v = os.Getenv("APP_BOOKS_BASE_PATH")
 	if v != "" {
-		booksBasePath = v
+		conf.BooksBasePath = v
 	}
 
 	v = os.Getenv("APP_BOOKS_STAGE_NAME")
 	if v != "" {
-		booksStageName = v
+		conf.BooksStageName = v
 	}
 
 	v = os.Getenv("APP_CERT_ARN")
 	if v != "" {
-		certArn = v
+		conf.CertArn = v
 	}
 
 	v = os.Getenv("APP_DEBUG")
 	if v != "" {
-		debug = v
+		conf.Debug = v
 	}
 
 	v = os.Getenv("APP_DIR")
 	if v != "" {
-		dir = v
+		conf.Dir = v
 	}
 
 	v = os.Getenv("APP_DNS_HOSTED_ZONE")
 	if v != "" {
-		dnsHostedZone = v
+		conf.DnsHostedZone = v
 	}
 
 	v = os.Getenv("APP_LAMBDA_ARN")
 	if v != "" {
-		lambdaArn = v
+		conf.LambdaArn = v
 	}
 
 	v = os.Getenv("APP_LAMBDA_BASE")
 	if v != "" {
-		lambdaBase = v
+		conf.LambdaBase = v
 	}
 
 	v = os.Getenv("APP_LAMBDA_HANDLER")
 	if v != "" {
-		lambdaHandler = v
+		conf.LambdaHandler = v
 	}
 
 	v = os.Getenv("APP_LAMBDA_NAME")
 	if v != "" {
-		lambdaName = v
+		conf.LambdaName = v
 	}
 
 	v = os.Getenv("APP_LAMBDA_PERM")
 	if v != "" {
-		lambdaPerm = v
+		conf.LambdaPerm = v
 	}
 
 	v = os.Getenv("APP_LAMBDA_POLICY_ARN")
 	if v != "" {
-		lambdaPolicyArn = v
+		conf.LambdaPolicyArn = v
 	}
 
 	v = os.Getenv("APP_LAMBDA_ROLE_ARN")
 	if v != "" {
-		lambdaRoleArn = v
+		conf.LambdaRoleArn = v
 	}
 
 	v = os.Getenv("APP_REGION")
 	if v != "" {
-		region = v
+		conf.Region = v
 	}
 
 	v = os.Getenv("AWS_PROFILE")
 	if v != "" {
-		awsProfile = v
+		conf.AwsProfile = v
 	}
 
-	conf = &Config{
-		Timestamp: timestamp,
-
-		Account:         account,
-		Api:             api,
-		ApiBase:         apiBase,
-		ApiDomain:       apiDomain,
-		ApiPath:         apiPath,
-		ApiProxy:        apiProxy,
-		ApiRoot:         apiRoot,
-		ApiStageName:    apiStageName,
-		ApiSubdomain:    apiSubdomain,
-		BooksApi:        booksApi,
-		BooksBase:       booksBase,
-		BooksBasePath:   booksBasePath,
-		BooksStageName:  booksStageName,
-		CertArn:         certArn,
-		Debug:           debug,
-		Dir:             dir,
-		DnsHostedZone:   dnsHostedZone,
-		LambdaArn:       lambdaArn,
-		LambdaBase:      lambdaBase,
-		LambdaHandler:   lambdaHandler,
-		LambdaName:      lambdaName,
-		LambdaPerm:      lambdaPerm,
-		LambdaPolicyArn: lambdaPolicyArn,
-		LambdaRoleArn:   lambdaRoleArn,
-		Region:          region,
-		AwsProfile:      awsProfile,
-	}
-
-	return conf
 }
 
-// Refresh returns a new Config if the Timestamp has changed
-func Refresh() *Config {
-	if conf == nil {
-		// conf not initialised
-		return New()
+// LoadFile sets the env from file and returns a new instance of Config
+func LoadFile(mode string) (conf *Config, err error) {
+	p := fmt.Sprintf(path.Join(os.Getenv("GOPATH"),
+		"/src/github.com/mozey/gateway/config.%v.json"), mode)
+	b, err := ioutil.ReadFile(p)
+	if err != nil {
+		return nil, err
 	}
-
-	timestamp = os.Getenv("APP_TIMESTAMP")
-	if conf.Timestamp != timestamp {
-		// Timestamp changed, reload config
-		return New()
+	configMap := make(map[string]string)
+	err = json.Unmarshal(b, &configMap)
+	if err != nil {
+		return nil, err
 	}
-
-	// No change
-	return conf
+	for key, val := range configMap {
+		os.Setenv(key, val)
+	}
+	return New(), nil
 }

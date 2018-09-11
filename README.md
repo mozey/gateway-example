@@ -1,62 +1,63 @@
 # [mozey/gateway](https://github.com/mozey/gateway)
 
-Serverless API example with Go and AWS Lambda using Apex Gateway
+Serverless API example written in Go 
+and deployed to AWS Lambda.
+
+Uses [gateway-echo](https://github.com/mozey/gateway-echo) 
+to create a lambda compatible wrapper around http server. 
+Inspired by [Apex Gateway](https://github.com/apex/gateway)
 
 
-# Quick start
+# Dev setup
 
     go get github.com/mozey/gateway
 
     cd ${GOPATH}/src/github.com/mozey/gateway
 
-Make scripts executable
+Use [config](https://github.com/mozey/config) to manage env
  
     chmod u+x ./scripts/*.sh
 
-Set env using `config` cmd, default env is dev.
-The config files must be in the package root.
-Remember to set your `AWS_PROFILE` in the prod config,  
-see [aws cli](https://docs.aws.amazon.com/cli/latest/userguide/cli-multiple-profiles.html)
-The dev config uses [aws-local](https://github.com/mozey/aws-local)
-
     export APP_DIR=$(pwd) && ./scripts/config.sh
-    
-    eval "$(./config)"
-    
-Print env
-
-    printenv | sort | grep -E 'AWS_|APP_'
     
 Run dev server
 
-    go run ./cmd/dev/dev.go &
+    dev && go run ./cmd/dev/dev.go
 
 Test
     
-    http localhost:${APP_PORT}
+    dev 
+    
+    http localhost:${APP_PORT}/v1
+    
+    http "localhost:${APP_PORT}/v1/foo?api_key=123&foo=123"
+    
+    http "localhost:${APP_PORT}/v1/foo?api_key=123&foo=panic"
+
+The dev config uses [aws-local](https://github.com/mozey/aws-local)
+for local services
 
 
 # Create lambda fn and API
 
-Clear env
-
-    unset $(compgen -v APP_)
+Set [AWS_PROFILE](https://docs.aws.amazon.com/cli/latest/userguide/cli-multiple-profiles.html) 
+in the prod config file
     
-Set prod env
+Set prod env,
+build the exe
+and create lambda fn and API mappings
+
+    prod 
     
-    $(./config -env prod)
-
-Build the exe
-
     ./scripts/build.sh
-    
-Create lambda fn and API
 
-    ./scripts/create.sh && $(./config -env prod)
+    ./scripts/create.sh 
     
 Call lambda endpoint
 
-    http "${APP_LAMBDA_BASE}/v1/foo?foo=foo&api_key=123"
+    prod
+
+    http "${APP_LAMBDA_BASE}/v1/foo?api_key=123&foo=boo"
     
 Add a custom domain to invoke the lambda fn via API gateway,
 all request methods and paths matching the prefix are forwarded to the lambda fn
@@ -64,12 +65,9 @@ all request methods and paths matching the prefix are forwarded to the lambda fn
     ./config -env prod \
     -key APP_API_PATH -value "v1" \
     -key APP_API_SUBDOMAIN -value api.mozey.co \
-    -key APP_API_DOMAIN -value mozey.co \
-    -update
+    -key APP_API_DOMAIN -value mozey.co
     
-    eval "$(./config -env prod)"
-    
-    ./scripts/domain.sh && $(./config -env prod)
+    prod && ./scripts/domain.sh
     
 Script will print an error message if cert is still validating.
 Wait for certificate validation to complete,
@@ -77,16 +75,20 @@ then run the script again to finish setup
     
 Call API (DNS may take some time to propagate)
 
+    prod
+
     http "${APP_API_BASE}/foo?foo=foo&api_key=123"
     
-Deploy to update the lambda fn
+    http "${APP_API_BASE}/bar"
+    
+Build and deploy to update the lambda fn
     
     ./scripts/deploy.sh
 
 
 # Delete lambda fn and API
 
-    eval "$(./config -env prod)" && ./scripts/reset.sh
+    prod && ./scripts/reset.sh
 
 
 # Makefile
@@ -99,13 +101,13 @@ Install dependencies
 
 Run with live reload    
     
-    eval "$(./config)" && make dev
+    dev && make dev
     
 Build and deploy lambda fn
 
-    eval "$(./config -env prod)" && make deploy
+    prod && make deploy
     
-fswatch only `*.go` file in current dir,
+fswatch only `*.go` files in current dir,
 note that the $ sign must be escaped in the Makefile
 
     fswatch -or --exclude ".*" --include "\\.go$" ./
@@ -148,9 +150,7 @@ Build container exe
 
     export APP_DIR=${GOPATH}/src/github.com/mozey/gateway
     
-    eval "$(./config)"
-    
-    ./scripts/build.container.sh
+    dev && ./scripts/build.container.sh
     
 Create container
 
@@ -177,10 +177,9 @@ see [books-api](https://github.com/mozey/aws-lambda-go/tree/master/examples/book
     ./config -env prod \
     -key APP_BOOKS_API -value ${APP_BOOKS_API} \
     -key APP_BOOKS_BASE_PATH -value "v1-b" \
-    -key APP_BOOKS_STAGE_NAME -value ${APP_BOOKS_STAGE_NAME} \
-    -update
+    -key APP_BOOKS_STAGE_NAME -value ${APP_BOOKS_STAGE_NAME}
     
-    $(./config -env prod)
+    prod
     
     aws apigateway create-base-path-mapping \
     --base-path ${APP_BOOKS_BASE_PATH} \
@@ -196,12 +195,11 @@ List all path mappings for the custom domain
 Update config
 
     ./config -env prod \
-    -key APP_BOOKS_BASE -value "https://${APP_API_SUBDOMAIN}/${APP_BOOKS_BASE_PATH}" \
-    -update
+    -key APP_BOOKS_BASE -value "https://${APP_API_SUBDOMAIN}/${APP_BOOKS_BASE_PATH}"
     
-    $(./config -env prod)
-
 Test
+
+    prod
 
     http ${APP_BOOKS_BASE}/books?isbn=978-1420931693
 
@@ -235,9 +233,7 @@ See [requestContext.Authorizer](https://github.com/apex/gateway/blame/cdfe71df14
 
 # sam local
 
-Alternative to deploy lambda functions and test them locally
-
-Commands below are untested...
+Alternative method to deploy lambda functions and test them locally
 
     GOOS=linux go build -o main ./cmd/gateway 
     

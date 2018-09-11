@@ -20,6 +20,11 @@ go build \
 -ldflags "-X main.AppDir=${APP_DIR}" \
 -o ${APP_DIR}/config ./cmd/config
 
+# Generate config helper
+cd ${APP_DIR}
+./config -env prod -generate ./internal/config
+go fmt ./internal/config/config.go
+
 # Git hooks
 chmod u+x ${APP_DIR}/githooks/*.sh
 ln -sf ${APP_DIR}/githooks/pre-commit.sh ${APP_DIR}/.git/hooks/pre-commit
@@ -32,14 +37,12 @@ then
     # Create dev config
     cp ${APP_DIR}/config.dev.sample.json ${APP_DIR}/config.dev.json
     ${APP_DIR}/config \
-    -key APP_DIR -value ${APP_DIR} \
-    -update
+    -key APP_DIR -value ${APP_DIR}
 
     # Create prod config
     cp ${APP_DIR}/config.prod.sample.json ${APP_DIR}/config.prod.json
     ${APP_DIR}/config -env prod \
-    -key APP_DIR -value ${APP_DIR} \
-    -update
+    -key APP_DIR -value ${APP_DIR}
 fi
 
 
