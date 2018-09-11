@@ -49,6 +49,7 @@ dev: dependencies
 
 # lambda........................................................................
 test: dependencies
+	./config -env dev -compare prod
 	gotest ./internal...
 
 build: clean test

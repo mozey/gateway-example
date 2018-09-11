@@ -1,13 +1,13 @@
 package handlers
 
 import (
-	"testing"
+	"github.com/labstack/echo"
+	"github.com/mozey/logutil"
+	"github.com/stretchr/testify/require"
 	"net/http"
 	"net/http/httptest"
 	"net/http/httputil"
-	"github.com/stretchr/testify/require"
-	"github.com/labstack/echo"
-	"fmt"
+	"testing"
 )
 
 func TestIndex(t *testing.T) {
@@ -26,8 +26,6 @@ func TestIndex(t *testing.T) {
 	// Verify response
 	dump, err := httputil.DumpResponse(rec.Result(), true)
 	require.NoError(t, err)
-	// TODO Why is log not printed with -v flag?
-	//logutil.Debug(string(dump)) // Print raw response
-	fmt.Println(string(dump))
+	logutil.Debug(string(dump)) // Print raw response
 	require.Equal(t, rec.Code, http.StatusOK, "invalid status code")
 }
