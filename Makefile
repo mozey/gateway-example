@@ -21,6 +21,21 @@ clean:
 # dev...........................................................................
 # Local server with live reload
 
+# Tests are cached,
+# to re-run all tests clear it first
+test.nocache:
+	go clean -testcache
+	@make test
+
+test: dependencies
+	./config -env dev -compare prod || \
+    { printf >&2 "dev and prod keys don't match\n"; exit 1; }
+ifneq ($(AWS_PROFILE),aws-local)
+	echo "Tests must use dev env"
+	exit 1
+endif
+	gotest ./internal...
+
 build.dev: dependencies clean
 	/usr/bin/env bash -c scripts/build.dev.sh
 
@@ -48,11 +63,12 @@ dev: dependencies
 # TODO Docker container with live reload
 
 # lambda........................................................................
-test: dependencies
-	./config -env dev -compare prod
-	gotest ./internal...
 
-build: clean test
+build: clean
+ifneq ($(AWS_PROFILE),s2s-lambda)
+	echo "Build must use prod env"
+	exit 1
+endif
 	/usr/bin/env bash -c scripts/build.sh
 
 deploy: build

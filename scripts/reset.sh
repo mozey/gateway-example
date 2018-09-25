@@ -12,6 +12,7 @@ APP_DIR=${APP_DIR}
 APP_LAMBDA_NAME=${APP_LAMBDA_NAME}
 APP_API_SUBDOMAIN=${APP_API_SUBDOMAIN}
 APP_API_PATH=${APP_API_PATH}
+APP_LAMBDA_POLICY_NAME=${APP_LAMBDA_POLICY_NAME}
 AWS_PROFILE=${AWS_PROFILE}
 
 # Confirm profile
@@ -23,12 +24,13 @@ then
     :
 else
     echo "Abort"
+    exit 1
 fi
 
 # Other managed/inline policies to detach/delete?
 APP_LAMBDA_POLICY_ARN=$(aws iam list-attached-role-policies \
 --role-name ${APP_LAMBDA_NAME} | \
-jq -r ".AttachedPolicies[] | select(.PolicyName == \"AWSLambdaBasicExecutionRole\") | .PolicyArn") \
+jq -r ".AttachedPolicies[] | select(.PolicyName == \"${APP_LAMBDA_POLICY_NAME}\") | .PolicyArn") \
 || APP_LAMBDA_POLICY_ARN=""
 if [ "${APP_LAMBDA_POLICY_ARN}" != "" ]
 then

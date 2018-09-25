@@ -8,19 +8,17 @@ import (
 )
 
 // CreateMux creates a new instance of echo
-func CreateMux() *echo.Echo {
-	e := echo.New()
+// It also returns a cleanup function that
+// must be called before the app exits
+func CreateMux() (e *echo.Echo, cleanup func()) {
+	e = echo.New()
 
-	e.Use(middleware.Auth())
-	e.Use(m.Logger())
-	//e.Use(m.LoggerWithConfig(m.LoggerConfig{
-	//	Format: "{\"method\"=${method}, \"uri\"=${uri}, \"status\"=${status}}\n",
-	//}))
-	e.Use(middleware.Recover())
+	h := handlers.NewHandler(config.New())
+	middleware.Setup(e, h)
 
 	e.GET("/v1", handlers.Index)
 	e.GET("/v1/foo", handlers.Foo)
 	e.GET("/v1/bar", handlers.Bar)
 
-	return e
+	return e, h.Cleanup
 }

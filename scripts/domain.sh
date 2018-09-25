@@ -19,16 +19,19 @@ APP_API=${APP_API}
 APP_API_STAGE_NAME=${APP_API_STAGE_NAME}
 AWS_PROFILE=${AWS_PROFILE}
 
-# Confirm profile
-read -p "AWS_PROFILE = ${AWS_PROFILE} continue (y)? " -n 1 -r
-echo ""
-if [[ ${REPLY} =~ ^[Yy]$ ]]
-then
-    :
-else
-    echo "Abort"
-    exit 1
-fi
+function prompt_continue() {
+    read -p "${1} AWS_PROFILE=${AWS_PROFILE} continue (y)? " -n 1 -r
+    echo ""
+    if [[ ${REPLY} =~ ^[Yy]$ ]]
+    then
+        :
+    else
+        echo "Abort"
+        exit 1
+    fi
+}
+
+prompt_continue "Create ${APP_API_PATH} mapping for custom domain ${APP_API_SUBDOMAIN}"
 
 
 # ..............................................................................
@@ -38,6 +41,8 @@ CERT_REGION=us-east-1
 
 APP_CERT_ARN=$(aws acm list-certificates --region ${CERT_REGION} | \
 jq -r ".CertificateSummaryList[] | select(.DomainName == \"${APP_API_SUBDOMAIN}\") | .CertificateArn")
+${APP_DIR}/config -env prod \
+-key "APP_CERT_ARN" -value "${APP_CERT_ARN}"
 if [ "${APP_CERT_ARN}" = "" ]
 then
     echo "Requesting cert for ${APP_API_SUBDOMAIN}"
@@ -58,6 +63,8 @@ DNS_VALIDATION_CNAME=$(echo ${DNS_VALIDATION} | jq -r .Name)
 DNS_VALIDATION_VALUE=$(echo ${DNS_VALIDATION} | jq -r .Value)
 APP_DNS_HOSTED_ZONE=$(aws route53 list-hosted-zones | \
 jq -r ".HostedZones[] | select(.Name == \"${APP_API_DOMAIN}.\") | .Id")
+${APP_DIR}/config -env prod \
+-key "APP_DNS_HOSTED_ZONE" -value "${APP_DNS_HOSTED_ZONE}"
 if [ "${APP_DNS_HOSTED_ZONE}" = "" ]
 then
     echo "Invalid APP_API_DOMAIN: no matching hosted zones"
@@ -150,6 +157,8 @@ then
 fi
 
 APP_API_BASE="https://${APP_API_SUBDOMAIN}/${APP_API_PATH}"
+${APP_DIR}/config -env prod \
+-key "APP_API_BASE" -value "${APP_API_BASE}"
 
 # ..............................................................................
 EXISTING_CNAME=$(aws route53 list-resource-record-sets --hosted-zone-id ${APP_DNS_HOSTED_ZONE} | \
@@ -184,8 +193,7 @@ fi
 
 # ..............................................................................
 
-${APP_DIR}/config -env prod \
--key "APP_CERT_ARN" -value "${APP_CERT_ARN}" \
--key "APP_API_BASE" -value "${APP_API_BASE}" \
--key "APP_DNS_HOSTED_ZONE" -value "${APP_DNS_HOSTED_ZONE}"
+echo "Done"
+
+
 
