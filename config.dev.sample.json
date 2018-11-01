@@ -25,5 +25,6 @@
     "APP_LAMBDA_ROLE_ARN": "",
     "APP_PORT": "8080",
     "APP_REGION": "YOUR_REGION_HERE",
+    "APP_VERSION": "dev",
     "AWS_PROFILE": "aws-local"
 }

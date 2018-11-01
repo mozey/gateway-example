@@ -14,29 +14,28 @@ dependencies:
 # default targets to run when only running `make`
 default: dependencies test
 
-# clean up
-clean:
-	go clean
-
 # dev...........................................................................
 # Local server with live reload
+clean.dev:
+	go clean
 
 # Tests are cached,
 # to re-run all tests clear it first
-test.nocache:
+test:
 	go clean -testcache
-	@make test
+	@make test.cache
 
-test: dependencies
+test.cache: dependencies
 	./config -env dev -compare prod || \
     { printf >&2 "dev and prod keys don't match\n"; exit 1; }
 ifneq ($(AWS_PROFILE),aws-local)
 	echo "Tests must use dev env"
 	exit 1
 endif
+	gotest ./pkg...
 	gotest ./internal...
 
-build.dev: dependencies clean
+build.dev: dependencies clean.dev
 	/usr/bin/env bash -c scripts/build.dev.sh
 
 # attempt to kill running server
@@ -59,21 +58,19 @@ dev: dependencies
 	@fswatch -or --exclude ".*" --include "\\.go$$" ./ | \
 	xargs -n1 -I{} make restart.dev || make kill.dev
 
-# container.....................................................................
-# TODO Docker container with live reload
-
 # lambda........................................................................
 
+clean:
+	go clean
+
 build: clean
-ifneq ($(AWS_PROFILE),s2s-lambda)
+ifeq ($(AWS_PROFILE),aws-local)
 	echo "Build must use prod env"
 	exit 1
 endif
 	/usr/bin/env bash -c scripts/build.sh
 
-deploy: build
-	/usr/bin/env bash -c scripts/deploy.sh
-
+# Deploy does not use the makefile
 
 
 

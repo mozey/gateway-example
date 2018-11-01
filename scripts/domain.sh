@@ -41,8 +41,6 @@ CERT_REGION=us-east-1
 
 APP_CERT_ARN=$(aws acm list-certificates --region ${CERT_REGION} | \
 jq -r ".CertificateSummaryList[] | select(.DomainName == \"${APP_API_SUBDOMAIN}\") | .CertificateArn")
-${APP_DIR}/config -env prod \
--key "APP_CERT_ARN" -value "${APP_CERT_ARN}"
 if [ "${APP_CERT_ARN}" = "" ]
 then
     echo "Requesting cert for ${APP_API_SUBDOMAIN}"
@@ -52,6 +50,9 @@ then
     --domain-name ${APP_API_SUBDOMAIN} --validation-method DNS
     APP_CERT_ARN=$(aws acm list-certificates --region ${CERT_REGION} | \
     jq -r ".CertificateSummaryList[] | select(.DomainName == \"${APP_API_SUBDOMAIN}\") | .CertificateArn")
+
+    ${APP_DIR}/config -env prod \
+    -key "APP_CERT_ARN" -value "${APP_CERT_ARN}"
 fi
 
 # ..............................................................................

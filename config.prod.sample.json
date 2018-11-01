@@ -25,5 +25,6 @@
     "APP_LAMBDA_ROLE_ARN": "",
     "APP_PORT": "",
     "APP_REGION": "YOUR_REGION_HERE",
+    "APP_VERSION": "",
     "AWS_PROFILE": "YOUR_PROFILE_HERE"
 }

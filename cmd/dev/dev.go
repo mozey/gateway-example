@@ -1,19 +1,15 @@
 package main
 
 import (
-	"os"
 	"fmt"
+	"github.com/mozey/gateway/internal/config"
 	"github.com/mozey/gateway/internal/routes"
 )
 
-// TODO Swagger annotations
-// https://github.com/swaggo/echo-swagger
 func main() {
-	port := os.Getenv("APP_PORT")
-	listen := fmt.Sprintf("localhost:%v", port)
-	// Start server
-	e := routes.CreateMux()
-	debug := os.Getenv("APP_DEBUG")
-	e.Debug = debug == "true"
+	conf := config.New()
+	listen := fmt.Sprintf("localhost:%v", conf.Port())
+	e, cleanup := routes.CreateMux(conf)
+	defer cleanup()
 	e.Logger.Fatal(e.Start(listen))
 }

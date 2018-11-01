@@ -9,7 +9,7 @@ import (
 )
 
 // Foo route handler
-func Foo(c echo.Context) error {
+func (h *Handler) Foo(c echo.Context) error {
 	foo := c.QueryParam("foo")
 	if foo == "" {
 		return echo.NewHTTPError(
@@ -24,7 +24,7 @@ func Foo(c echo.Context) error {
 	if foo == "config" {
 		conf := config.New()
 		resp := Response{
-			Message: fmt.Sprintf("conf.Debug %v", conf.Debug)}
+			Message: fmt.Sprintf("conf.Debug %v", conf.Debug())}
 		return c.JSON(http.StatusOK, resp)
 	}
 

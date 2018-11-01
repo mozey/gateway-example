@@ -14,7 +14,7 @@ APP_LAMBDA_NAME=${APP_LAMBDA_NAME}
 APP_LAMBDA_HANDLER=${APP_LAMBDA_HANDLER}
 APP_REGION=${APP_REGION}
 AWS_PROFILE=${AWS_PROFILE}
-DEPLOYMENTS_DIR=${APP_DIR}/deployments
+APP_LAMBDA_POLICY_NAME=${APP_LAMBDA_POLICY_NAME}
 
 function prompt_continue() {
     read -p "${1} AWS_PROFILE=${AWS_PROFILE} continue (y)? " -n 1 -r
@@ -33,14 +33,13 @@ function prompt_continue() {
 prompt_continue "Create lambda function ${APP_LAMBDA_NAME}"
 
 APP_ACCOUNT=$(aws sts get-caller-identity | jq -r .Account)
-APP_LAMBDA_POLICY_NAME="S2S-Lambda"
 
 ${APP_DIR}/config -env prod \
 -key "APP_ACCOUNT" -value "${APP_ACCOUNT}" \
 -key "APP_LAMBDA_POLICY_NAME" -value "${APP_LAMBDA_POLICY_NAME}" \
 
 aws iam create-role --role-name ${APP_LAMBDA_NAME} \
---assume-role-policy-document file://${DEPLOYMENTS_DIR}/aws/trust-policy.json
+--assume-role-policy-document file://${APP_DIR}/deployments/aws/trust-policy.json
 APP_LAMBDA_ROLE_ARN="arn:aws:iam::${APP_ACCOUNT}:role/${APP_LAMBDA_NAME}"
 ${APP_DIR}/config -env prod \
 -key "APP_LAMBDA_ROLE_ARN" -value "${APP_LAMBDA_ROLE_ARN}"
@@ -52,11 +51,9 @@ ${APP_DIR}/config -env prod \
 aws iam attach-role-policy --role-name ${APP_LAMBDA_NAME} \
 --policy-arn ${APP_LAMBDA_POLICY_ARN}
 
-# NOTE the vpc-config requires EC2 permissions on the S2S-Lambda policy
 aws lambda create-function --function-name ${APP_LAMBDA_NAME} --runtime go1.x \
 --role ${APP_LAMBDA_ROLE_ARN} \
 --handler ${APP_LAMBDA_HANDLER} --zip-file fileb://${APP_DIR}/build/main.zip \
---vpc-config file://${DEPLOYMENTS_DIR}/aws/vpc-config.json \
 --timeout 300 \
 --memory-size 128
 
@@ -81,8 +78,8 @@ ${APP_DIR}/config -env prod \
 -key "APP_API" -value "${APP_API}"
 
 # Get APP_API by name
-#APP_API=$(aws apigateway get-rest-apis | \
-#jq -r ".items[]  | select(.name == \"${APP_LAMBDA_NAME}\") | .id")
+APP_API=$(aws apigateway get-rest-apis | \
+jq -r ".items[]  | select(.name == \"${APP_LAMBDA_NAME}\") | .id")
 
 APP_API_ROOT=$(aws apigateway get-resources --rest-api-id ${APP_API} | \
 jq -r .items[0].id)

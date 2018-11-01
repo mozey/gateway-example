@@ -5,10 +5,16 @@ import (
 	"net/http"
 )
 
-type Response struct {
+// IndexResponse is the index handler
+type IndexResponse struct {
 	Message string
+	Version string
 }
 
-func Index(c echo.Context) error {
-	return c.JSON(http.StatusOK, Response{Message: "It works!"})
+// Index can be used to check if the server is available
+func (h *Handler) Index(c echo.Context) error {
+	return c.JSON(http.StatusOK, IndexResponse{
+		Message: "It works!!",
+		Version: h.Config.Version(),
+	})
 }

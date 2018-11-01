@@ -14,20 +14,11 @@ APP_DIR=${APP_DIR}
 export APP_DEBUG=true
 
 # Build config util
-go get github.com/mozey/config
+go get -u github.com/mozey/config
 cd ${GOPATH}/src/github.com/mozey/config
 go build \
 -ldflags "-X main.AppDir=${APP_DIR}" \
 -o ${APP_DIR}/config ./cmd/config
-
-# Generate config helper
-cd ${APP_DIR}
-./config -env prod -generate ./internal/config
-go fmt ./internal/config/config.go
-
-# Git hooks
-chmod u+x ${APP_DIR}/githooks/*.sh
-ln -sf ${APP_DIR}/githooks/pre-commit.sh ${APP_DIR}/.git/hooks/pre-commit
 
 read -p "Reset config files (y)? " -n 1 -r
 echo ""
@@ -45,4 +36,11 @@ then
     -key APP_DIR -value ${APP_DIR}
 fi
 
+# Generate config helper
+cd ${APP_DIR}
+./config -env prod -generate ./internal/config
+go fmt ./internal/config/config.go
 
+# Git hooks
+chmod u+x ${APP_DIR}/githooks/*.sh
+ln -sf ${APP_DIR}/githooks/pre-commit.sh ${APP_DIR}/.git/hooks/pre-commit

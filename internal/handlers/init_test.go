@@ -1,9 +1,10 @@
 package handlers_test
 
 import (
+	"github.com/labstack/gommon/log"
 	"github.com/mozey/gateway/internal/config"
-	"github.com/mozey/logutil"
-	"log"
+	"github.com/mozey/gateway/pkg/handler"
+	stdLog "log"
 )
 
 var conf *config.Config
@@ -13,10 +14,11 @@ func init() {
 	// Load conf
 	conf, err = config.LoadFile("dev")
 	if err != nil {
-		log.Panic(err)
+		panic(err)
 	}
-	// Avoid setting env vars in IDE
-	logutil.SetDebug(conf.Debug == "true")
-	// Include file name and line number in logs
-	log.SetFlags(log.Ldate | log.Ltime | log.LUTC | log.Lshortfile)
+
+	// Setup logging
+	stdLog.SetFlags(stdLog.Ldate | stdLog.Ltime | stdLog.LUTC | stdLog.Lshortfile)
+	log.SetLevel(log.DEBUG)
+	log.SetHeader(hutil.LogFormat)
 }

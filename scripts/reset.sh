@@ -15,17 +15,20 @@ APP_API_PATH=${APP_API_PATH}
 APP_LAMBDA_POLICY_NAME=${APP_LAMBDA_POLICY_NAME}
 AWS_PROFILE=${AWS_PROFILE}
 
-# Confirm profile
-read -p "AWS_PROFILE = ${AWS_PROFILE} delete lambda fn and API ${APP_LAMBDA_NAME} (y)? " -n 1 -r
-echo ""
-echo ""
-if [[ ${REPLY} =~ ^[Yy]$ ]]
-then
-    :
-else
-    echo "Abort"
-    exit 1
-fi
+function prompt_continue() {
+    read -p "${1} AWS_PROFILE=${AWS_PROFILE} continue (y)? " -n 1 -r
+    echo ""
+    if [[ ${REPLY} =~ ^[Yy]$ ]]
+    then
+        :
+    else
+        echo "Abort"
+        exit 1
+    fi
+}
+
+prompt_continue "Delete lambda fn and API ${APP_LAMBDA_NAME}"
+
 
 # Other managed/inline policies to detach/delete?
 APP_LAMBDA_POLICY_ARN=$(aws iam list-attached-role-policies \

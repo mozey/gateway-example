@@ -82,40 +82,188 @@ var lambdaPolicyArn string
 // APP_LAMBDA_ROLE_ARN
 var lambdaRoleArn string
 
+// APP_PORT
+var port string
+
 // APP_REGION
 var region string
+
+// APP_VERSION
+var version string
 
 // AWS_PROFILE
 var awsProfile string
 
 // Config fields correspond to config file keys less the prefix
 type Config struct {
-	Account         string // APP_ACCOUNT
-	Api             string // APP_API
-	ApiBase         string // APP_API_BASE
-	ApiDomain       string // APP_API_DOMAIN
-	ApiPath         string // APP_API_PATH
-	ApiProxy        string // APP_API_PROXY
-	ApiRoot         string // APP_API_ROOT
-	ApiStageName    string // APP_API_STAGE_NAME
-	ApiSubdomain    string // APP_API_SUBDOMAIN
-	BooksApi        string // APP_BOOKS_API
-	BooksBase       string // APP_BOOKS_BASE
-	BooksBasePath   string // APP_BOOKS_BASE_PATH
-	BooksStageName  string // APP_BOOKS_STAGE_NAME
-	CertArn         string // APP_CERT_ARN
-	Debug           string // APP_DEBUG
-	Dir             string // APP_DIR
-	DnsHostedZone   string // APP_DNS_HOSTED_ZONE
-	LambdaArn       string // APP_LAMBDA_ARN
-	LambdaBase      string // APP_LAMBDA_BASE
-	LambdaHandler   string // APP_LAMBDA_HANDLER
-	LambdaName      string // APP_LAMBDA_NAME
-	LambdaPerm      string // APP_LAMBDA_PERM
-	LambdaPolicyArn string // APP_LAMBDA_POLICY_ARN
-	LambdaRoleArn   string // APP_LAMBDA_ROLE_ARN
-	Region          string // APP_REGION
-	AwsProfile      string // AWS_PROFILE
+	account         string // APP_ACCOUNT
+	api             string // APP_API
+	apiBase         string // APP_API_BASE
+	apiDomain       string // APP_API_DOMAIN
+	apiPath         string // APP_API_PATH
+	apiProxy        string // APP_API_PROXY
+	apiRoot         string // APP_API_ROOT
+	apiStageName    string // APP_API_STAGE_NAME
+	apiSubdomain    string // APP_API_SUBDOMAIN
+	booksApi        string // APP_BOOKS_API
+	booksBase       string // APP_BOOKS_BASE
+	booksBasePath   string // APP_BOOKS_BASE_PATH
+	booksStageName  string // APP_BOOKS_STAGE_NAME
+	certArn         string // APP_CERT_ARN
+	debug           string // APP_DEBUG
+	dir             string // APP_DIR
+	dnsHostedZone   string // APP_DNS_HOSTED_ZONE
+	lambdaArn       string // APP_LAMBDA_ARN
+	lambdaBase      string // APP_LAMBDA_BASE
+	lambdaHandler   string // APP_LAMBDA_HANDLER
+	lambdaName      string // APP_LAMBDA_NAME
+	lambdaPerm      string // APP_LAMBDA_PERM
+	lambdaPolicyArn string // APP_LAMBDA_POLICY_ARN
+	lambdaRoleArn   string // APP_LAMBDA_ROLE_ARN
+	port            string // APP_PORT
+	region          string // APP_REGION
+	version         string // APP_VERSION
+	awsProfile      string // AWS_PROFILE
+}
+
+// Account is APP_ACCOUNT
+func (c *Config) Account() string {
+	return c.account
+}
+
+// Api is APP_API
+func (c *Config) Api() string {
+	return c.api
+}
+
+// ApiBase is APP_API_BASE
+func (c *Config) ApiBase() string {
+	return c.apiBase
+}
+
+// ApiDomain is APP_API_DOMAIN
+func (c *Config) ApiDomain() string {
+	return c.apiDomain
+}
+
+// ApiPath is APP_API_PATH
+func (c *Config) ApiPath() string {
+	return c.apiPath
+}
+
+// ApiProxy is APP_API_PROXY
+func (c *Config) ApiProxy() string {
+	return c.apiProxy
+}
+
+// ApiRoot is APP_API_ROOT
+func (c *Config) ApiRoot() string {
+	return c.apiRoot
+}
+
+// ApiStageName is APP_API_STAGE_NAME
+func (c *Config) ApiStageName() string {
+	return c.apiStageName
+}
+
+// ApiSubdomain is APP_API_SUBDOMAIN
+func (c *Config) ApiSubdomain() string {
+	return c.apiSubdomain
+}
+
+// BooksApi is APP_BOOKS_API
+func (c *Config) BooksApi() string {
+	return c.booksApi
+}
+
+// BooksBase is APP_BOOKS_BASE
+func (c *Config) BooksBase() string {
+	return c.booksBase
+}
+
+// BooksBasePath is APP_BOOKS_BASE_PATH
+func (c *Config) BooksBasePath() string {
+	return c.booksBasePath
+}
+
+// BooksStageName is APP_BOOKS_STAGE_NAME
+func (c *Config) BooksStageName() string {
+	return c.booksStageName
+}
+
+// CertArn is APP_CERT_ARN
+func (c *Config) CertArn() string {
+	return c.certArn
+}
+
+// Debug is APP_DEBUG
+func (c *Config) Debug() string {
+	return c.debug
+}
+
+// Dir is APP_DIR
+func (c *Config) Dir() string {
+	return c.dir
+}
+
+// DnsHostedZone is APP_DNS_HOSTED_ZONE
+func (c *Config) DnsHostedZone() string {
+	return c.dnsHostedZone
+}
+
+// LambdaArn is APP_LAMBDA_ARN
+func (c *Config) LambdaArn() string {
+	return c.lambdaArn
+}
+
+// LambdaBase is APP_LAMBDA_BASE
+func (c *Config) LambdaBase() string {
+	return c.lambdaBase
+}
+
+// LambdaHandler is APP_LAMBDA_HANDLER
+func (c *Config) LambdaHandler() string {
+	return c.lambdaHandler
+}
+
+// LambdaName is APP_LAMBDA_NAME
+func (c *Config) LambdaName() string {
+	return c.lambdaName
+}
+
+// LambdaPerm is APP_LAMBDA_PERM
+func (c *Config) LambdaPerm() string {
+	return c.lambdaPerm
+}
+
+// LambdaPolicyArn is APP_LAMBDA_POLICY_ARN
+func (c *Config) LambdaPolicyArn() string {
+	return c.lambdaPolicyArn
+}
+
+// LambdaRoleArn is APP_LAMBDA_ROLE_ARN
+func (c *Config) LambdaRoleArn() string {
+	return c.lambdaRoleArn
+}
+
+// Port is APP_PORT
+func (c *Config) Port() string {
+	return c.port
+}
+
+// Region is APP_REGION
+func (c *Config) Region() string {
+	return c.region
+}
+
+// Version is APP_VERSION
+func (c *Config) Version() string {
+	return c.version
+}
+
+// AwsProfile is AWS_PROFILE
+func (c *Config) AwsProfile() string {
+	return c.awsProfile
 }
 
 // New creates an instance of Config.
@@ -134,107 +282,115 @@ func New() *Config {
 func SetVars(conf *Config) {
 
 	if account != "" {
-		conf.Account = account
+		conf.account = account
 	}
 
 	if api != "" {
-		conf.Api = api
+		conf.api = api
 	}
 
 	if apiBase != "" {
-		conf.ApiBase = apiBase
+		conf.apiBase = apiBase
 	}
 
 	if apiDomain != "" {
-		conf.ApiDomain = apiDomain
+		conf.apiDomain = apiDomain
 	}
 
 	if apiPath != "" {
-		conf.ApiPath = apiPath
+		conf.apiPath = apiPath
 	}
 
 	if apiProxy != "" {
-		conf.ApiProxy = apiProxy
+		conf.apiProxy = apiProxy
 	}
 
 	if apiRoot != "" {
-		conf.ApiRoot = apiRoot
+		conf.apiRoot = apiRoot
 	}
 
 	if apiStageName != "" {
-		conf.ApiStageName = apiStageName
+		conf.apiStageName = apiStageName
 	}
 
 	if apiSubdomain != "" {
-		conf.ApiSubdomain = apiSubdomain
+		conf.apiSubdomain = apiSubdomain
 	}
 
 	if booksApi != "" {
-		conf.BooksApi = booksApi
+		conf.booksApi = booksApi
 	}
 
 	if booksBase != "" {
-		conf.BooksBase = booksBase
+		conf.booksBase = booksBase
 	}
 
 	if booksBasePath != "" {
-		conf.BooksBasePath = booksBasePath
+		conf.booksBasePath = booksBasePath
 	}
 
 	if booksStageName != "" {
-		conf.BooksStageName = booksStageName
+		conf.booksStageName = booksStageName
 	}
 
 	if certArn != "" {
-		conf.CertArn = certArn
+		conf.certArn = certArn
 	}
 
 	if debug != "" {
-		conf.Debug = debug
+		conf.debug = debug
 	}
 
 	if dir != "" {
-		conf.Dir = dir
+		conf.dir = dir
 	}
 
 	if dnsHostedZone != "" {
-		conf.DnsHostedZone = dnsHostedZone
+		conf.dnsHostedZone = dnsHostedZone
 	}
 
 	if lambdaArn != "" {
-		conf.LambdaArn = lambdaArn
+		conf.lambdaArn = lambdaArn
 	}
 
 	if lambdaBase != "" {
-		conf.LambdaBase = lambdaBase
+		conf.lambdaBase = lambdaBase
 	}
 
 	if lambdaHandler != "" {
-		conf.LambdaHandler = lambdaHandler
+		conf.lambdaHandler = lambdaHandler
 	}
 
 	if lambdaName != "" {
-		conf.LambdaName = lambdaName
+		conf.lambdaName = lambdaName
 	}
 
 	if lambdaPerm != "" {
-		conf.LambdaPerm = lambdaPerm
+		conf.lambdaPerm = lambdaPerm
 	}
 
 	if lambdaPolicyArn != "" {
-		conf.LambdaPolicyArn = lambdaPolicyArn
+		conf.lambdaPolicyArn = lambdaPolicyArn
 	}
 
 	if lambdaRoleArn != "" {
-		conf.LambdaRoleArn = lambdaRoleArn
+		conf.lambdaRoleArn = lambdaRoleArn
+	}
+
+	if port != "" {
+		conf.port = port
 	}
 
 	if region != "" {
-		conf.Region = region
+		conf.region = region
+	}
+
+	if version != "" {
+		conf.version = version
 	}
 
 	if awsProfile != "" {
-		conf.AwsProfile = awsProfile
+		conf.awsProfile = awsProfile
 	}
 
 }
@@ -245,132 +401,142 @@ func SetEnv(conf *Config) {
 
 	v = os.Getenv("APP_ACCOUNT")
 	if v != "" {
-		conf.Account = v
+		conf.account = v
 	}
 
 	v = os.Getenv("APP_API")
 	if v != "" {
-		conf.Api = v
+		conf.api = v
 	}
 
 	v = os.Getenv("APP_API_BASE")
 	if v != "" {
-		conf.ApiBase = v
+		conf.apiBase = v
 	}
 
 	v = os.Getenv("APP_API_DOMAIN")
 	if v != "" {
-		conf.ApiDomain = v
+		conf.apiDomain = v
 	}
 
 	v = os.Getenv("APP_API_PATH")
 	if v != "" {
-		conf.ApiPath = v
+		conf.apiPath = v
 	}
 
 	v = os.Getenv("APP_API_PROXY")
 	if v != "" {
-		conf.ApiProxy = v
+		conf.apiProxy = v
 	}
 
 	v = os.Getenv("APP_API_ROOT")
 	if v != "" {
-		conf.ApiRoot = v
+		conf.apiRoot = v
 	}
 
 	v = os.Getenv("APP_API_STAGE_NAME")
 	if v != "" {
-		conf.ApiStageName = v
+		conf.apiStageName = v
 	}
 
 	v = os.Getenv("APP_API_SUBDOMAIN")
 	if v != "" {
-		conf.ApiSubdomain = v
+		conf.apiSubdomain = v
 	}
 
 	v = os.Getenv("APP_BOOKS_API")
 	if v != "" {
-		conf.BooksApi = v
+		conf.booksApi = v
 	}
 
 	v = os.Getenv("APP_BOOKS_BASE")
 	if v != "" {
-		conf.BooksBase = v
+		conf.booksBase = v
 	}
 
 	v = os.Getenv("APP_BOOKS_BASE_PATH")
 	if v != "" {
-		conf.BooksBasePath = v
+		conf.booksBasePath = v
 	}
 
 	v = os.Getenv("APP_BOOKS_STAGE_NAME")
 	if v != "" {
-		conf.BooksStageName = v
+		conf.booksStageName = v
 	}
 
 	v = os.Getenv("APP_CERT_ARN")
 	if v != "" {
-		conf.CertArn = v
+		conf.certArn = v
 	}
 
 	v = os.Getenv("APP_DEBUG")
 	if v != "" {
-		conf.Debug = v
+		conf.debug = v
 	}
 
 	v = os.Getenv("APP_DIR")
 	if v != "" {
-		conf.Dir = v
+		conf.dir = v
 	}
 
 	v = os.Getenv("APP_DNS_HOSTED_ZONE")
 	if v != "" {
-		conf.DnsHostedZone = v
+		conf.dnsHostedZone = v
 	}
 
 	v = os.Getenv("APP_LAMBDA_ARN")
 	if v != "" {
-		conf.LambdaArn = v
+		conf.lambdaArn = v
 	}
 
 	v = os.Getenv("APP_LAMBDA_BASE")
 	if v != "" {
-		conf.LambdaBase = v
+		conf.lambdaBase = v
 	}
 
 	v = os.Getenv("APP_LAMBDA_HANDLER")
 	if v != "" {
-		conf.LambdaHandler = v
+		conf.lambdaHandler = v
 	}
 
 	v = os.Getenv("APP_LAMBDA_NAME")
 	if v != "" {
-		conf.LambdaName = v
+		conf.lambdaName = v
 	}
 
 	v = os.Getenv("APP_LAMBDA_PERM")
 	if v != "" {
-		conf.LambdaPerm = v
+		conf.lambdaPerm = v
 	}
 
 	v = os.Getenv("APP_LAMBDA_POLICY_ARN")
 	if v != "" {
-		conf.LambdaPolicyArn = v
+		conf.lambdaPolicyArn = v
 	}
 
 	v = os.Getenv("APP_LAMBDA_ROLE_ARN")
 	if v != "" {
-		conf.LambdaRoleArn = v
+		conf.lambdaRoleArn = v
+	}
+
+	v = os.Getenv("APP_PORT")
+	if v != "" {
+		conf.port = v
 	}
 
 	v = os.Getenv("APP_REGION")
 	if v != "" {
-		conf.Region = v
+		conf.region = v
+	}
+
+	v = os.Getenv("APP_VERSION")
+	if v != "" {
+		conf.version = v
 	}
 
 	v = os.Getenv("AWS_PROFILE")
 	if v != "" {
-		conf.AwsProfile = v
+		conf.awsProfile = v
 	}
 
 }

@@ -1,8 +1,8 @@
-package handlers
+package handlers_test
 
 import (
 	"github.com/labstack/echo"
-	"github.com/mozey/logutil"
+	"github.com/mozey/gateway/internal/handlers"
 	"github.com/stretchr/testify/require"
 	"net/http"
 	"net/http/httptest"
@@ -10,22 +10,24 @@ import (
 	"testing"
 )
 
-func TestIndex(t *testing.T) {
+func TestHandler_Index(t *testing.T) {
+	// Create shared handler
+	e := echo.New()
+	h := handlers.NewHandler(e, conf)
+	defer h.Cleanup()
+
 	// Create request
 	req, err := http.NewRequest("GET", "/", nil)
-	if err != nil {
-		t.Fatal(err)
-	}
+	require.NoError(t, err)
 
 	// Record handler response
 	rec := httptest.NewRecorder()
-	e := echo.New()
 	c := e.NewContext(req, rec)
-	Index(c)
+	require.NoError(t, h.Index(c))
 
 	// Verify response
 	dump, err := httputil.DumpResponse(rec.Result(), true)
 	require.NoError(t, err)
-	logutil.Debug(string(dump)) // Print raw response
+	h.Debugj(c, "raw response ", dump)
 	require.Equal(t, rec.Code, http.StatusOK, "invalid status code")
 }

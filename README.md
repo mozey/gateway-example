@@ -169,7 +169,7 @@ Test
     http localhost:${APP_PORT}
 
 
-# Micro-service for a specific path? 
+# Micro-service for a specific path
 
 Make base path `/v1-b` call a different lambda function,
 see [books-api](https://github.com/mozey/aws-lambda-go/tree/master/examples/books-api)
