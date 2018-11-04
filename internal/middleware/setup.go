@@ -24,11 +24,32 @@ func Skipper(c echo.Context) bool {
 	// Skip auth validator for these routes
 	if path == "/" ||
 		path == "/v1" ||
-		path == "/v1/bar" {
+		path == "/v1/bar" ||
+		path == "/v1/status" {
 		return true
 	}
 
 	return false
+}
+
+func customHTTPErrorHandler(err error, c echo.Context) {
+	code := http.StatusInternalServerError
+	message := http.StatusText(http.StatusInternalServerError)
+	if he, ok := err.(*echo.HTTPError); ok {
+		code = he.Code
+		message = fmt.Sprintf("%s", he.Message)
+	}
+	type response struct {
+		Message string `json:"message"`
+	}
+	resp := response{
+		Message: message,
+	}
+	if err := c.JSON(code, resp); err != nil {
+		c.Logger().Error(err)
+	}
+	// Request logger already prints this?
+	//c.Logger().Error(err)
 }
 
 // Setup middleware
@@ -61,4 +82,8 @@ func Setup(e *echo.Echo, h *handlers.Handler) {
 		recoverConfig.DisablePrintStack = true
 		e.Use(em.RecoverWithConfig(recoverConfig))
 	}
+
+	// Custom error handling
+	// https://echo.labstack.com/guide/error-handling
+	e.HTTPErrorHandler = customHTTPErrorHandler
 }

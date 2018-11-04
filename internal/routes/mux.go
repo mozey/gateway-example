@@ -21,6 +21,7 @@ func CreateMux(conf *config.Config) (e *echo.Echo, cleanup func()) {
 	e.GET("/v1", h.Index)
 	e.GET("/v1/foo", h.Foo)
 	e.GET("/v1/bar", h.Bar)
+	e.GET("/v1/status", h.Status)
 
 	return e, h.Cleanup
 }
