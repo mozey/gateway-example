@@ -2,13 +2,14 @@ package handlers
 
 import (
 	"fmt"
-	"github.com/labstack/echo"
+	"github.com/julienschmidt/httprouter"
 	"net/http"
 	"strings"
 )
 
 // Pass message
 const Pass = "ok"
+
 // Skip message
 const Skip = "-"
 
@@ -20,7 +21,9 @@ type StatusResponse struct {
 }
 
 // Status can be used to check if services the server depends on are available
-func (h *Handler) Status(c echo.Context) error {
+func (h *Handler) Status(w http.ResponseWriter, r *http.Request) {
+	params := httprouter.ParamsFromContext(r.Context())
+
 	resp := StatusResponse{}
 	code := http.StatusOK
 
@@ -28,10 +31,10 @@ func (h *Handler) Status(c echo.Context) error {
 		"connectivity": false,
 	}
 
-	metrics := c.QueryParam("metrics")
+	metrics := params.ByName("metrics")
 	if metrics != "" {
 		// Only show status for the specified metrics
-		for _, m := range strings.Split(c.QueryParam("metrics"), ",") {
+		for _, m := range strings.Split(metrics, ",") {
 			if _, ok := check[m]; ok {
 				check[m] = true
 			}
@@ -61,5 +64,6 @@ func (h *Handler) Status(c echo.Context) error {
 		resp.Connectivity = Skip
 	}
 
-	return c.JSON(code, resp)
+	w.WriteHeader(code)
+	RespondJSON(w, r, resp)
 }

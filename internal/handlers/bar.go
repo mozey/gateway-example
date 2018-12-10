@@ -1,14 +1,13 @@
 package handlers
 
 import (
-	"net/http"
 	"fmt"
-	"github.com/labstack/echo"
+	"net/http"
 )
 
 // Bar route handler
-func (h *Handler) Bar(c echo.Context) error {
+func (h *Handler) Bar(w http.ResponseWriter, r *http.Request) {
 	resp := Response{Message: fmt.Sprintf("no api_key required")}
-	return c.JSON(http.StatusOK, resp)
+	RespondJSON(w, r, resp)
 }
 

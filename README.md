@@ -3,7 +3,7 @@
 Serverless API example written in Go 
 and deployed to AWS Lambda.
 
-Uses [gateway-echo](https://github.com/mozey/gateway-echo) 
+Uses [gateway-wrapper](https://github.com/mozey/gateway-wrapper) 
 to create a lambda compatible wrapper around http server. 
 Inspired by [Apex Gateway](https://github.com/apex/gateway)
 
@@ -229,6 +229,14 @@ APIGatewayProxyRequestContext contains the information to identify the
 AWS account and resources invoking the Lambda function. 
 It also includes Cognito identity information for the caller. 
 See [requestContext.Authorizer](https://github.com/apex/gateway/blame/cdfe71df1421609687c01dda11f13ef068784e5b/Readme.md#L31)
+
+
+# Context
+
+Background reading
+[Go Concurrency Patterns: Context](https://blog.golang.org/context)
+[Context package](https://golang.org/pkg/context/)
+[Params via Go 1.7 Contexts](https://github.com/julienschmidt/httprouter/pull/147#issuecomment-367696689)
 
 
 # sam local

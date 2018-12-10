@@ -1,7 +1,6 @@
 package handlers
 
 import (
-	"github.com/labstack/echo"
 	"net/http"
 )
 
@@ -12,8 +11,8 @@ type IndexResponse struct {
 }
 
 // Index can be used to check if the server is available
-func (h *Handler) Index(c echo.Context) error {
-	return c.JSON(http.StatusOK, IndexResponse{
+func (h *Handler) Index(w http.ResponseWriter, r *http.Request) {
+	RespondJSON(w, r, IndexResponse{
 		Message: "It works!!",
 		Version: h.Config.Version(),
 	})

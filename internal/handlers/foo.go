@@ -1,20 +1,23 @@
 package handlers
 
 import (
-	"net/http"
-	"log"
 	"fmt"
-	"github.com/labstack/echo"
+	"github.com/julienschmidt/httprouter"
 	"github.com/mozey/gateway/internal/config"
+	"log"
+	"net/http"
 )
 
 // Foo route handler
-func (h *Handler) Foo(c echo.Context) error {
-	foo := c.QueryParam("foo")
+func (h *Handler) Foo(w http.ResponseWriter, r *http.Request) {
+	params := httprouter.ParamsFromContext(r.Context())
+	foo := params.ByName("foo")
 	if foo == "" {
-		return echo.NewHTTPError(
-			http.StatusUnauthorized,
-			"missing foo in the query string")
+		w.WriteHeader(http.StatusUnauthorized)
+		RespondJSON(w, r, Response{
+			Message: "missing foo in the query string",
+		})
+		return
 	}
 	if foo == "panic" {
 		//time.Sleep(1 * time.Second)
@@ -25,11 +28,14 @@ func (h *Handler) Foo(c echo.Context) error {
 		conf := config.New()
 		resp := Response{
 			Message: fmt.Sprintf("conf.Debug %v", conf.Debug())}
-		return c.JSON(http.StatusOK, resp)
+		RespondJSON(w, r, resp)
+		return
 	}
 
 	// Auth middleware sets "user" on the echo context
 	resp := Response{
-		Message: fmt.Sprintf("foo: %v user: %v", foo, c.Get("user"))}
-	return c.JSON(http.StatusOK, resp)
+		Message: fmt.Sprintf("foo: %v user: %v", foo,
+			r.Context().Value("user"))}
+	RespondJSON(w, r, resp)
+	return
 }
