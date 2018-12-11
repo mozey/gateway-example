@@ -1,10 +1,11 @@
 package handlers_test
 
 import (
-	"github.com/labstack/gommon/log"
 	"github.com/mozey/gateway/internal/config"
-	"github.com/mozey/gateway/pkg/handler"
-	stdLog "log"
+	"github.com/rs/zerolog"
+	"github.com/rs/zerolog/log"
+	"os"
+	"time"
 )
 
 var conf *config.Config
@@ -18,7 +19,10 @@ func init() {
 	}
 
 	// Setup logging
-	stdLog.SetFlags(stdLog.Ldate | stdLog.Ltime | stdLog.LUTC | stdLog.Lshortfile)
-	log.SetLevel(log.DEBUG)
-	log.SetHeader(hutil.LogFormat)
+	log.Logger = log.Output(zerolog.ConsoleWriter{
+		Out:        os.Stderr,
+		NoColor:    false,
+		TimeFormat: time.RFC3339,
+	})
+	zerolog.SetGlobalLevel(zerolog.DebugLevel)
 }

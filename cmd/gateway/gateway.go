@@ -1,16 +1,17 @@
 package main
 
 import (
-	"github.com/mozey/gateway-echo"
+	"github.com/mozey/gateway-wrapper/httprouter"
 	"github.com/mozey/gateway/internal/config"
 	"github.com/mozey/gateway/internal/routes"
+	"github.com/rs/zerolog/log"
 )
 
 func main() {
 	conf := config.New()
-	e, cleanup := routes.CreateMux(conf)
+
+	h, cleanup := routes.CreateRouter(conf)
 	defer cleanup()
-	// TODO Is this the right way to use echo with apex/gateway?
-	// https://forum.labstack.com/t/is-echo-v3-compatible-with-http-handlerfunc/523
-	e.Logger.Fatal(gateway.Start(e))
+
+	log.Fatal().Err(gwrapper.Start(h.Handler))
 }
