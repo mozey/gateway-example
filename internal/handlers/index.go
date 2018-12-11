@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"github.com/mozey/gateway/pkg/response"
 	"net/http"
 )
 
@@ -12,7 +13,7 @@ type IndexResponse struct {
 
 // Index can be used to check if the server is available
 func (h *Handler) Index(w http.ResponseWriter, r *http.Request) {
-	RespondJSON(w, r, IndexResponse{
+	response.JSON(http.StatusOK, w, r, IndexResponse{
 		Message: "It works!!",
 		Version: h.Config.Version(),
 	})

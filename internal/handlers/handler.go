@@ -1,35 +1,18 @@
 package handlers
 
 import (
-	"encoding/json"
-	"fmt"
 	"github.com/julienschmidt/httprouter"
 	"github.com/mozey/gateway/internal/config"
-	"github.com/mozey/gateway/pkg/handler"
-	"github.com/rs/zerolog/log"
+	"github.com/mozey/gateway/pkg/services"
 	"net/http"
 )
 
-// Handler for  mozey/gateway
+// Handler for mozey/gateway
 type Handler struct {
-	*hutil.Handler
+	*services.Services
 	Config *config.Config
 	Router *httprouter.Router
-}
-
-// Response to be used or extended by handlers
-type Response struct {
-	Message string `json:"message"`
-}
-
-// RespondJSON can be used by route handler to respond to requests
-func RespondJSON(w http.ResponseWriter, r *http.Request, i interface{}) {
-	j, err := json.MarshalIndent(i, "", "    ")
-	if err != nil {
-		log.Panic().Err(err)
-	}
-	w.Header().Set("Content-Type", "application/json")
-	fmt.Fprint(w, string(j))
+	Handler http.Handler
 }
 
 // NewHandler creates a new handler and initialises services
@@ -39,11 +22,14 @@ func RespondJSON(w http.ResponseWriter, r *http.Request, i interface{}) {
 func NewHandler(conf *config.Config) (h *Handler) {
 	h = &Handler{}
 	h.Config = conf
-	h.Handler = hutil.NewHandler(&hutil.Config{
+	h.Services = services.NewServices(&services.Options{
 		Debug:      conf.Debug(),
 		Region:     conf.Region(),
 		AwsProfile: conf.AwsProfile(),
 	})
 	h.Router = httprouter.New()
+	// Remember to assign returned handler
+	// when wrapping middleware
+	h.Handler = h.Router
 	return h
 }

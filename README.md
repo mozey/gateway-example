@@ -30,9 +30,9 @@ Test
     
     http localhost:${APP_PORT}/v1
     
-    http "localhost:${APP_PORT}/v1/foo?api_key=123&foo=123"
+    http "localhost:${APP_PORT}/v1/foo/123?api_key=123"
     
-    http "localhost:${APP_PORT}/v1/foo?api_key=123&foo=panic"
+    http "localhost:${APP_PORT}/v1/foo/panic?api_key=123"
 
 The dev config uses [aws-local](https://github.com/mozey/aws-local)
 for local services
@@ -57,7 +57,7 @@ Call lambda endpoint
 
     prod
 
-    http "${APP_LAMBDA_BASE}/v1/foo?api_key=123&foo=boo"
+    http "${APP_LAMBDA_BASE}/v1/foo/boo?api_key=123"
     
 Add a custom domain to invoke the lambda fn via API gateway,
 all request methods and paths matching the prefix are forwarded to the lambda fn
@@ -77,7 +77,7 @@ Call API (DNS may take some time to propagate)
 
     prod
 
-    http "${APP_API_BASE}/foo?foo=foo&api_key=123"
+    http "${APP_API_BASE}/foo/foo?api_key=123"
     
     http "${APP_API_BASE}/bar"
     

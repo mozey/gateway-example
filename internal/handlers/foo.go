@@ -4,7 +4,9 @@ import (
 	"fmt"
 	"github.com/julienschmidt/httprouter"
 	"github.com/mozey/gateway/internal/config"
-	"log"
+	"github.com/mozey/gateway/pkg/middleware"
+	"github.com/mozey/gateway/pkg/response"
+	"github.com/rs/zerolog/log"
 	"net/http"
 )
 
@@ -13,8 +15,7 @@ func (h *Handler) Foo(w http.ResponseWriter, r *http.Request) {
 	params := httprouter.ParamsFromContext(r.Context())
 	foo := params.ByName("foo")
 	if foo == "" {
-		w.WriteHeader(http.StatusUnauthorized)
-		RespondJSON(w, r, Response{
+		response.JSON(http.StatusUnauthorized, w, r, response.Response{
 			Message: "missing foo in the query string",
 		})
 		return
@@ -22,20 +23,27 @@ func (h *Handler) Foo(w http.ResponseWriter, r *http.Request) {
 	if foo == "panic" {
 		//time.Sleep(1 * time.Second)
 		// Pass in foo=panic to see the middleware.RecoveryHandler in action
-		log.Panic("oops!")
+		log.Panic().Msg("oops!")
 	}
 	if foo == "config" {
 		conf := config.New()
-		resp := Response{
+		resp := response.Response{
 			Message: fmt.Sprintf("conf.Debug %v", conf.Debug())}
-		RespondJSON(w, r, resp)
+		response.JSON(http.StatusOK, w, r, resp)
 		return
 	}
 
-	// Auth middleware sets "user" on the echo context
-	resp := Response{
-		Message: fmt.Sprintf("foo: %v user: %v", foo,
-			r.Context().Value("user"))}
-	RespondJSON(w, r, resp)
+	// Auth middleware sets user on the context
+	user, ok := r.Context().Value(middleware.User{}).(middleware.User)
+	if !ok {
+		response.JSON(http.StatusInternalServerError, w, r, response.Response{
+			Message: "user not set",
+		})
+		return
+	}
+
+	resp := response.Response{
+		Message: fmt.Sprintf("foo: %v user: %v", foo, user.Name)}
+	response.JSON(http.StatusOK, w, r, resp)
 	return
 }

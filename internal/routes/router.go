@@ -3,19 +3,47 @@ package routes
 import (
 	"github.com/mozey/gateway/internal/config"
 	"github.com/mozey/gateway/internal/handlers"
+	"github.com/mozey/gateway/internal/middleware"
+	pm "github.com/mozey/gateway/pkg/middleware"
+	"github.com/rs/zerolog"
+	"github.com/rs/zerolog/log"
+	"os"
+	"time"
 )
 
 // CreateRouter creates a new router.
 // It also returns a cleanup function that
-// must be called before the app exits
-func CreateRouter(conf *config.Config) (h *handlers.Handler) {
+// must be called before the server exits
+func CreateRouter(conf *config.Config) (h *handlers.Handler, cleanup func()) {
+	// Namespace for handlers and services
 	h = handlers.NewHandler(conf)
-	//middleware.Setup(e, h)
 
+	// Routes
 	h.Router.HandlerFunc("GET", "/v1", h.Index)
-	h.Router.HandlerFunc("GET", "/v1/foo", h.Foo)
+	h.Router.HandlerFunc("GET", "/v1/foo/:foo", h.Foo)
 	h.Router.HandlerFunc("GET", "/v1/bar", h.Bar)
 	h.Router.HandlerFunc("GET", "/v1/status", h.Status)
 
-	return h
+	// Router setup
+	h.Router.PanicHandler = pm.PanicHandler(&pm.PanicHandlerOptions{
+		PrintStack: true,
+	})
+	h.Router.NotFound = pm.NotFound()
+
+	// Logger setup
+	zerolog.TimeFieldFormat = time.RFC3339
+	zerolog.SetGlobalLevel(zerolog.InfoLevel)
+	if conf.AwsProfile() == "aws-local" {
+		log.Logger = log.Output(zerolog.ConsoleWriter{
+			Out:        os.Stderr,
+			NoColor:    false,
+			TimeFormat: time.RFC3339,
+		})
+		zerolog.SetGlobalLevel(zerolog.DebugLevel)
+	}
+
+	// Middleware
+	middleware.Setup(h)
+
+	return h, h.Cleanup
 }

@@ -3,6 +3,7 @@ package handlers
 import (
 	"fmt"
 	"github.com/julienschmidt/httprouter"
+	"github.com/mozey/gateway/pkg/response"
 	"net/http"
 	"strings"
 )
@@ -65,5 +66,5 @@ func (h *Handler) Status(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.WriteHeader(code)
-	RespondJSON(w, r, resp)
+	response.JSON(http.StatusOK, w, r, resp)
 }

@@ -10,9 +10,17 @@ import (
 
 func main() {
 	conf := config.New()
+
+	h, cleanup := routes.CreateRouter(conf)
+	defer cleanup()
+
+	fmt.Println(".")
+	fmt.Println(".")
+	fmt.Println(".")
+	fmt.Println(".")
+	fmt.Println(".")
+
 	listen := fmt.Sprintf("localhost:%v", conf.Port())
-	h := routes.CreateRouter(conf)
-	defer h.Handler.Cleanup()
 	log.Info().Msgf("listening on %s", listen)
-	log.Fatal().Err(http.ListenAndServe(listen, h.Router))
+	log.Fatal().Err(http.ListenAndServe(listen, h.Handler))
 }
