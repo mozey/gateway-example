@@ -3,9 +3,8 @@ package middleware
 import (
 	"fmt"
 	"github.com/mozey/gateway/pkg/response"
-	"github.com/rs/zerolog/log"
 	"net/http"
-	"runtime/debug"
+	"runtime"
 )
 
 type PanicHandlerFunc func(http.ResponseWriter, *http.Request, interface{})
@@ -19,9 +18,13 @@ func PanicHandler(o *PanicHandlerOptions) PanicHandlerFunc {
 		response.JSON(http.StatusInternalServerError, w, r, response.Response{
 			Message: fmt.Sprintf("%s", rcv),
 		})
-		log.Error().Msg(rcv.(string))
 		if o.PrintStack {
-			debug.PrintStack()
+			var stackSize = 4 << 10 // 4 KB
+			b := make([]byte, stackSize)
+			length := runtime.Stack(b, false)
+			fmt.Println(string(b[:length]))
+			// TODO Use zerolog to print stack trace
+			// https://github.com/rs/zerolog/pull/35/files
 		}
 	}
 }

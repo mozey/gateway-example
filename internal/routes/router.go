@@ -26,13 +26,15 @@ func CreateRouter(conf *config.Config) (h *handlers.Handler, cleanup func()) {
 
 	// Router setup
 	h.Router.PanicHandler = pm.PanicHandler(&pm.PanicHandlerOptions{
-		PrintStack: true,
+		// Logging stack traces in prod not supported yet
+		PrintStack: conf.AwsProfile() == "aws-local",
 	})
 	h.Router.NotFound = pm.NotFound()
 
 	// Logger setup
 	zerolog.TimeFieldFormat = time.RFC3339
 	zerolog.SetGlobalLevel(zerolog.InfoLevel)
+	log.Logger = log.With().Caller().Logger()
 	if conf.AwsProfile() == "aws-local" {
 		log.Logger = log.Output(zerolog.ConsoleWriter{
 			Out:        os.Stderr,
