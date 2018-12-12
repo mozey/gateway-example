@@ -28,24 +28,23 @@ func Auth(next http.Handler) http.Handler {
 
 		// Authenticate
 		apiKey := r.URL.Query().Get("api_key")
-		if apiKey == "123" {
-			user := User{Name: "joe"}
-
-			ctx := r.Context()
-			ctx = context.WithValue(ctx, User{}, user)
-			r = r.WithContext(ctx)
-
-			// Call the next handler
-			next.ServeHTTP(w, r)
-			return
+		if apiKey != "123" {
+			// http.StatusUnauthorized => Authentication
+			// http.StatusForbidden => Authorization
+			msg := "Invalid or missing api_key"
+			response.JSON(http.StatusUnauthorized, w, r, response.Response{
+				Message: msg,
+			})
+			log.Error().Msg(msg)
 		}
 
-		// http.StatusUnauthorized => Authentication
-		// http.StatusForbidden => Authorization
-		msg := "Invalid or missing api_key"
-		response.JSON(http.StatusUnauthorized, w, r, response.Response{
-			Message: msg,
-		})
-		log.Error().Msg(msg)
+		user := User{Name: "joe"}
+
+		ctx := r.Context()
+		ctx = context.WithValue(ctx, User{}, user)
+		r = r.WithContext(ctx)
+
+		// Call the next handler
+		next.ServeHTTP(w, r)
 	})
 }
