@@ -9,8 +9,9 @@ import (
 
 // Setup middleware
 func Setup(h *handlers.Handler) {
-	h.Handler = middleware.RequestLogger(h.Handler)
+	// Middleware in reverse order,
 	h.Handler = middleware.Auth(h.Handler)
+	//h.Handler = middleware.RequestLogger(h.Handler)
 	h.Handler = gh.CompressHandlerLevel(h.Handler, gzip.BestSpeed)
 	h.Handler = middleware.RequestID(h.Handler)
 }

@@ -3,7 +3,6 @@ package middleware
 import (
 	"context"
 	"github.com/mozey/gateway/pkg/response"
-	"github.com/rs/zerolog/log"
 	"net/http"
 )
 
@@ -35,7 +34,7 @@ func Auth(next http.Handler) http.Handler {
 			response.JSON(http.StatusUnauthorized, w, r, response.Response{
 				Message: msg,
 			})
-			log.Error().Msg(msg)
+			return
 		}
 
 		user := User{Name: "joe"}
