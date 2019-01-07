@@ -2,8 +2,8 @@ package main
 
 import (
 	"fmt"
+	"github.com/mozey/gateway/internal/app"
 	"github.com/mozey/gateway/internal/config"
-	"github.com/mozey/gateway/internal/routes"
 	"github.com/rs/zerolog/log"
 	"net/http"
 )
@@ -11,7 +11,7 @@ import (
 func main() {
 	conf := config.New()
 
-	h, cleanup := routes.CreateRouter(conf)
+	h, cleanup := app.CreateRouter(conf)
 	defer cleanup()
 
 	fmt.Println(".")
