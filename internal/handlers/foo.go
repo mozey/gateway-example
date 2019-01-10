@@ -12,6 +12,7 @@ import (
 
 // Foo route handler
 func (h *Handler) Foo(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
 	params := httprouter.ParamsFromContext(r.Context())
 	foo := params.ByName("foo")
 	if foo == "" {
@@ -23,7 +24,7 @@ func (h *Handler) Foo(w http.ResponseWriter, r *http.Request) {
 	if foo == "panic" {
 		//time.Sleep(1 * time.Second)
 		// Pass in foo=panic to see the middleware.RecoveryHandler in action
-		log.Panic().Msg("oops!")
+		log.Ctx(ctx).Panic().Msg("oops!")
 	}
 	if foo == "config" {
 		conf := config.New()

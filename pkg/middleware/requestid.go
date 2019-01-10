@@ -5,12 +5,12 @@ import (
 	"net/http"
 )
 
+const HeaderXRequestID = "X-Request-ID"
+
 func RequestID(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		const headerXRequestID = "X-Request-ID"
-
 		// Use existing header if available
-		requestID := r.Header.Get(headerXRequestID)
+		requestID := r.Header.Get(HeaderXRequestID)
 
 		if requestID == "" {
 			// Generate new id
@@ -21,8 +21,8 @@ func RequestID(next http.Handler) http.Handler {
 			requestID = id.String()
 		}
 
-		// Set header
-		w.Header().Set(headerXRequestID, requestID)
+		// Header
+		w.Header().Set(HeaderXRequestID, requestID)
 
 		// Call the next handler
 		next.ServeHTTP(w, r)

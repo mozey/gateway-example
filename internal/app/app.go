@@ -67,6 +67,10 @@ func SetupLogger(conf *config.Config) {
 			TimeFormat: time.RFC3339,
 		})
 	}
+
+	// Add contextual fields to the global logger
+	// https://github.com/rs/zerolog#add-contextual-fields-to-the-global-logger
+	log.Logger = log.With().Str("global_ctx", "foo").Logger()
 }
 
 // SetupMiddleware configures the middleware given a route handler

@@ -3,6 +3,7 @@ package middleware
 import (
 	"context"
 	"github.com/mozey/gateway/pkg/response"
+	"github.com/rs/zerolog/log"
 	"net/http"
 )
 
@@ -12,6 +13,8 @@ type User struct {
 
 func Auth(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		ctx := r.Context()
+
 		// Skip auth for public paths
 		path := r.URL.Path
 		switch path {
@@ -27,7 +30,12 @@ func Auth(next http.Handler) http.Handler {
 
 		// Authenticate
 		apiKey := r.URL.Query().Get("api_key")
-		if apiKey != "123" {
+		user := User{}
+		if apiKey == "123" {
+			user.Name = "joe"
+		} else if apiKey == "456" {
+			user.Name = "jane"
+		} else {
 			// http.StatusUnauthorized => Authentication
 			// http.StatusForbidden => Authorization
 			msg := "Invalid or missing api_key"
@@ -37,13 +45,19 @@ func Auth(next http.Handler) http.Handler {
 			return
 		}
 
-		user := User{Name: "joe"}
-
-		ctx := r.Context()
+		// Set user on context
 		ctx = context.WithValue(ctx, User{}, user)
-		r = r.WithContext(ctx)
+
+		// Pass a sub-logger by context
+		// https://github.com/rs/zerolog#pass-a-sub-logger-by-context
+		logger := log.With().
+			Str("user_name", user.Name).
+			Str("request_id", w.Header().Get(HeaderXRequestID)).
+			Logger()
+		ctx = logger.WithContext(ctx)
 
 		// Call the next handler
+		r = r.WithContext(ctx)
 		next.ServeHTTP(w, r)
 	})
 }
