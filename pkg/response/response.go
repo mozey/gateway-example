@@ -37,8 +37,7 @@ func JSON(code int, w http.ResponseWriter, r *http.Request, resp interface{}) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(code) // Must be called after w.Header().Set?
 
-	// Request ID can be read from the response header if required
-	//requestID := w.Header().Get("X-Request-ID")
+	// Note that request_id and user_name is set on ctx by auth middleware
 
 	// Log request here instead of in middleware,
 	// otherwise status code is not logged.
