@@ -3,10 +3,8 @@
 Serverless API example written in Go 
 and deployed to AWS Lambda.
 
-Uses [gateway-wrapper](https://github.com/mozey/gateway-wrapper) 
+Uses [Apex Gateway](https://github.com/apex/gateway) 
 to create a lambda compatible wrapper around http server. 
-Inspired by [Apex Gateway](https://github.com/apex/gateway)
-
 
 # Dev setup
 
