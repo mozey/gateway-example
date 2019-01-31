@@ -1,7 +1,7 @@
 package handlers_test
 
 import (
-	"github.com/mozey/gateway/internal/handlers"
+	"github.com/mozey/gateway/internal/api/handlers"
 	"github.com/rs/zerolog/log"
 	"github.com/stretchr/testify/require"
 	"net/http"

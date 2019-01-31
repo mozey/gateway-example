@@ -14,9 +14,8 @@ dependencies:
 # default targets to run when only running `make`
 default: dependencies test
 
-# dev...........................................................................
-# Local server with live reload
-clean.dev:
+# ..............................................................................
+clean:
 	go clean
 
 # Tests are cached,
@@ -32,45 +31,44 @@ ifneq ($(AWS_PROFILE),aws-local)
 	echo "Tests must use dev env"
 	exit 1
 endif
+	gotest ./cmd...
 	gotest ./pkg...
 	gotest ./internal...
 
-build.dev: dependencies clean.dev
-	/usr/bin/env bash -c scripts/build.dev.sh
+
+# api...........................................................................
+# Local server with live reload
+build.api.dev: dependencies clean
+	/usr/bin/env bash -c scripts/api/build.dev.sh
 
 # attempt to kill running server
-kill.dev:
-	@echo kill.dev
+kill.api.dev:
+	@echo kill.api.dev
 	-@killall -9 $(PROG_DEV) 2>/dev/null || true
 
 # attempt to build and start server
-restart.dev:
-	@echo restart.dev
-	@make kill.dev
-	@make build.dev; (if [ "$$?" -eq 0 ]; then (./${PROG_DEV} &); fi)
+restart.api.dev:
+	@echo restart.api.dev
+	@make kill.api.dev
+	@make build.api.dev; (if [ "$$?" -eq 0 ]; then (./${PROG_DEV} &); fi)
 
 # watch .go files for changes then recompile & try to start server
 # will also kill server after ctrl+c
 # fswatch includes everything unless an exclusion filter says otherwise
 # https://stackoverflow.com/a/37237681/639133
-dev: dependencies
-	@make restart.dev
+api: dependencies
+	@make restart.api.dev
 	@fswatch -or --exclude ".*" --include "\\.go$$" ./ | \
-	xargs -n1 -I{} make restart.dev || make kill.dev
+	xargs -n1 -I{} make restart.api.dev || make kill.api.dev
 
 # lambda........................................................................
 
-clean:
-	go clean
-
-build: clean
+build.api: clean
 ifeq ($(AWS_PROFILE),aws-local)
 	echo "Build must use prod env"
 	exit 1
 endif
-	/usr/bin/env bash -c scripts/build.sh
-
-# Deploy does not use the makefile
+	/usr/bin/env bash -c scripts/api/build.sh
 
 
 

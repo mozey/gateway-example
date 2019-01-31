@@ -4,8 +4,9 @@ import (
 	"compress/gzip"
 	"fmt"
 	gh "github.com/gorilla/handlers"
+	"github.com/mozey/gateway/internal/api/routes"
 	"github.com/mozey/gateway/internal/config"
-	"github.com/mozey/gateway/internal/handlers"
+	"github.com/mozey/gateway/internal/api/handlers"
 	"github.com/mozey/gateway/pkg/middleware"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
@@ -23,10 +24,8 @@ func CreateRouter(conf *config.Config) (h *handlers.Handler, cleanup func()) {
 	h = handlers.NewHandler(conf)
 
 	// Routes
-	h.Router.HandlerFunc("GET", "/v1", h.Index)
-	h.Router.HandlerFunc("GET", "/v1/foo/:foo", h.Foo)
-	h.Router.HandlerFunc("GET", "/v1/bar", h.Bar)
-	h.Router.HandlerFunc("GET", "/v1/status", h.Status)
+	routes.Console(h)
+	routes.Misc(h)
 
 	// Router setup
 	h.Router.PanicHandler = middleware.PanicHandler(

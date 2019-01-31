@@ -13,28 +13,28 @@ import (
 // APP_ACCOUNT
 var account string
 
-// APP_API
+// APP_GW_ID_API
 var api string
 
-// APP_API_BASE
+// APP_GW_BASE_API
 var apiBase string
 
-// APP_API_DOMAIN
+// APP_GW_DOMAIN
 var apiDomain string
 
-// APP_API_PATH
+// APP_GW_PATH_API
 var apiPath string
 
-// APP_API_PROXY
+// APP_GW_PROXY_API
 var apiProxy string
 
-// APP_API_ROOT
+// APP_GW_ROOT_API
 var apiRoot string
 
-// APP_API_STAGE_NAME
+// APP_GW_STAGE_NAME_API
 var apiStageName string
 
-// APP_API_SUBDOMAIN
+// APP_GW_SUBDOMAIN
 var apiSubdomain string
 
 // APP_BOOKS_API
@@ -61,25 +61,25 @@ var dir string
 // APP_DNS_HOSTED_ZONE
 var dnsHostedZone string
 
-// APP_LAMBDA_ARN
+// APP_LAMBDA_ARN_API
 var lambdaArn string
 
-// APP_LAMBDA_BASE
+// APP_LAMBDA_BASE_API
 var lambdaBase string
 
-// APP_LAMBDA_HANDLER
+// APP_LAMBDA_HANDLER_API
 var lambdaHandler string
 
-// APP_LAMBDA_NAME
+// APP_LAMBDA_NAME_API
 var lambdaName string
 
-// APP_LAMBDA_PERM
+// APP_LAMBDA_PERM_API
 var lambdaPerm string
 
 // APP_LAMBDA_POLICY_ARN
 var lambdaPolicyArn string
 
-// APP_LAMBDA_ROLE_ARN
+// APP_LAMBDA_ROLE_ARN_API
 var lambdaRoleArn string
 
 // APP_PORT
@@ -97,14 +97,14 @@ var awsProfile string
 // Config fields correspond to config file keys less the prefix
 type Config struct {
 	account         string // APP_ACCOUNT
-	api             string // APP_API
-	apiBase         string // APP_API_BASE
-	apiDomain       string // APP_API_DOMAIN
-	apiPath         string // APP_API_PATH
-	apiProxy        string // APP_API_PROXY
-	apiRoot         string // APP_API_ROOT
-	apiStageName    string // APP_API_STAGE_NAME
-	apiSubdomain    string // APP_API_SUBDOMAIN
+	api             string // APP_GW_ID_API
+	apiBase         string // APP_GW_BASE_API
+	apiDomain       string // APP_GW_DOMAIN
+	apiPath         string // APP_GW_PATH_API
+	apiProxy        string // APP_GW_PROXY_API
+	apiRoot         string // APP_GW_ROOT_API
+	apiStageName    string // APP_GW_STAGE_NAME_API
+	apiSubdomain    string // APP_GW_SUBDOMAIN
 	booksApi        string // APP_BOOKS_API
 	booksBase       string // APP_BOOKS_BASE
 	booksBasePath   string // APP_BOOKS_BASE_PATH
@@ -113,13 +113,13 @@ type Config struct {
 	debug           string // APP_DEBUG
 	dir             string // APP_DIR
 	dnsHostedZone   string // APP_DNS_HOSTED_ZONE
-	lambdaArn       string // APP_LAMBDA_ARN
-	lambdaBase      string // APP_LAMBDA_BASE
-	lambdaHandler   string // APP_LAMBDA_HANDLER
-	lambdaName      string // APP_LAMBDA_NAME
-	lambdaPerm      string // APP_LAMBDA_PERM
+	lambdaArn       string // APP_LAMBDA_ARN_API
+	lambdaBase      string // APP_LAMBDA_BASE_API
+	lambdaHandler   string // APP_LAMBDA_HANDLER_API
+	lambdaName      string // APP_LAMBDA_NAME_API
+	lambdaPerm      string // APP_LAMBDA_PERM_API
 	lambdaPolicyArn string // APP_LAMBDA_POLICY_ARN
-	lambdaRoleArn   string // APP_LAMBDA_ROLE_ARN
+	lambdaRoleArn   string // APP_LAMBDA_ROLE_ARN_API
 	port            string // APP_PORT
 	region          string // APP_REGION
 	version         string // APP_VERSION
@@ -131,42 +131,42 @@ func (c *Config) Account() string {
 	return c.account
 }
 
-// Api is APP_API
+// Api is APP_GW_ID_API
 func (c *Config) Api() string {
 	return c.api
 }
 
-// ApiBase is APP_API_BASE
+// ApiBase is APP_GW_BASE_API
 func (c *Config) ApiBase() string {
 	return c.apiBase
 }
 
-// ApiDomain is APP_API_DOMAIN
+// ApiDomain is APP_GW_DOMAIN
 func (c *Config) ApiDomain() string {
 	return c.apiDomain
 }
 
-// ApiPath is APP_API_PATH
+// ApiPath is APP_GW_PATH_API
 func (c *Config) ApiPath() string {
 	return c.apiPath
 }
 
-// ApiProxy is APP_API_PROXY
+// ApiProxy is APP_GW_PROXY_API
 func (c *Config) ApiProxy() string {
 	return c.apiProxy
 }
 
-// ApiRoot is APP_API_ROOT
+// ApiRoot is APP_GW_ROOT_API
 func (c *Config) ApiRoot() string {
 	return c.apiRoot
 }
 
-// ApiStageName is APP_API_STAGE_NAME
+// ApiStageName is APP_GW_STAGE_NAME_API
 func (c *Config) ApiStageName() string {
 	return c.apiStageName
 }
 
-// ApiSubdomain is APP_API_SUBDOMAIN
+// ApiSubdomain is APP_GW_SUBDOMAIN
 func (c *Config) ApiSubdomain() string {
 	return c.apiSubdomain
 }
@@ -211,27 +211,27 @@ func (c *Config) DnsHostedZone() string {
 	return c.dnsHostedZone
 }
 
-// LambdaArn is APP_LAMBDA_ARN
+// LambdaArn is APP_LAMBDA_ARN_API
 func (c *Config) LambdaArn() string {
 	return c.lambdaArn
 }
 
-// LambdaBase is APP_LAMBDA_BASE
+// LambdaBase is APP_LAMBDA_BASE_API
 func (c *Config) LambdaBase() string {
 	return c.lambdaBase
 }
 
-// LambdaHandler is APP_LAMBDA_HANDLER
+// LambdaHandler is APP_LAMBDA_HANDLER_API
 func (c *Config) LambdaHandler() string {
 	return c.lambdaHandler
 }
 
-// LambdaName is APP_LAMBDA_NAME
+// LambdaName is APP_LAMBDA_NAME_API
 func (c *Config) LambdaName() string {
 	return c.lambdaName
 }
 
-// LambdaPerm is APP_LAMBDA_PERM
+// LambdaPerm is APP_LAMBDA_PERM_API
 func (c *Config) LambdaPerm() string {
 	return c.lambdaPerm
 }
@@ -241,7 +241,7 @@ func (c *Config) LambdaPolicyArn() string {
 	return c.lambdaPolicyArn
 }
 
-// LambdaRoleArn is APP_LAMBDA_ROLE_ARN
+// LambdaRoleArn is APP_LAMBDA_ROLE_ARN_API
 func (c *Config) LambdaRoleArn() string {
 	return c.lambdaRoleArn
 }
@@ -404,42 +404,42 @@ func SetEnv(conf *Config) {
 		conf.account = v
 	}
 
-	v = os.Getenv("APP_API")
+	v = os.Getenv("APP_GW_ID_API")
 	if v != "" {
 		conf.api = v
 	}
 
-	v = os.Getenv("APP_API_BASE")
+	v = os.Getenv("APP_GW_BASE_API")
 	if v != "" {
 		conf.apiBase = v
 	}
 
-	v = os.Getenv("APP_API_DOMAIN")
+	v = os.Getenv("APP_GW_DOMAIN")
 	if v != "" {
 		conf.apiDomain = v
 	}
 
-	v = os.Getenv("APP_API_PATH")
+	v = os.Getenv("APP_GW_PATH_API")
 	if v != "" {
 		conf.apiPath = v
 	}
 
-	v = os.Getenv("APP_API_PROXY")
+	v = os.Getenv("APP_GW_PROXY_API")
 	if v != "" {
 		conf.apiProxy = v
 	}
 
-	v = os.Getenv("APP_API_ROOT")
+	v = os.Getenv("APP_GW_ROOT_API")
 	if v != "" {
 		conf.apiRoot = v
 	}
 
-	v = os.Getenv("APP_API_STAGE_NAME")
+	v = os.Getenv("APP_GW_STAGE_NAME_API")
 	if v != "" {
 		conf.apiStageName = v
 	}
 
-	v = os.Getenv("APP_API_SUBDOMAIN")
+	v = os.Getenv("APP_GW_SUBDOMAIN")
 	if v != "" {
 		conf.apiSubdomain = v
 	}
@@ -484,27 +484,27 @@ func SetEnv(conf *Config) {
 		conf.dnsHostedZone = v
 	}
 
-	v = os.Getenv("APP_LAMBDA_ARN")
+	v = os.Getenv("APP_LAMBDA_ARN_API")
 	if v != "" {
 		conf.lambdaArn = v
 	}
 
-	v = os.Getenv("APP_LAMBDA_BASE")
+	v = os.Getenv("APP_LAMBDA_BASE_API")
 	if v != "" {
 		conf.lambdaBase = v
 	}
 
-	v = os.Getenv("APP_LAMBDA_HANDLER")
+	v = os.Getenv("APP_LAMBDA_HANDLER_API")
 	if v != "" {
 		conf.lambdaHandler = v
 	}
 
-	v = os.Getenv("APP_LAMBDA_NAME")
+	v = os.Getenv("APP_LAMBDA_NAME_API")
 	if v != "" {
 		conf.lambdaName = v
 	}
 
-	v = os.Getenv("APP_LAMBDA_PERM")
+	v = os.Getenv("APP_LAMBDA_PERM_API")
 	if v != "" {
 		conf.lambdaPerm = v
 	}
@@ -514,7 +514,7 @@ func SetEnv(conf *Config) {
 		conf.lambdaPolicyArn = v
 	}
 
-	v = os.Getenv("APP_LAMBDA_ROLE_ARN")
+	v = os.Getenv("APP_LAMBDA_ROLE_ARN_API")
 	if v != "" {
 		conf.lambdaRoleArn = v
 	}

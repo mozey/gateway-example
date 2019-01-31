@@ -10,7 +10,7 @@ bash -c 'set -o pipefail'
 
 # Must fail with "unbound variable" if these are not set
 APP_DIR=${APP_DIR}
-APP_LAMBDA_HANDLER=${APP_LAMBDA_HANDLER}
+APP_LAMBDA_HANDLER_API=${APP_LAMBDA_HANDLER_API}
 
 # Set version string for current revision,
 # versions for future shared packages can be appended to APP_VERSION.
@@ -29,7 +29,7 @@ mkdir -p ${APP_DIR}/build
 echo "Building exe"
 cd ${APP_DIR}
 env GOOS=linux GOARCH=amd64 go build \
--o build/${APP_LAMBDA_HANDLER} \
+-o build/${APP_LAMBDA_HANDLER_API} \
 ./cmd/gateway
 # TODO Save hash of binary to prod env
 
@@ -38,7 +38,7 @@ NAME="main.zip"
 rm -f ${APP_DIR}/build/${NAME}
 
 echo "Zip new build"
-zip -j ${APP_DIR}/build/${NAME} ${APP_DIR}/build/${APP_LAMBDA_HANDLER}
+zip -j ${APP_DIR}/build/${NAME} ${APP_DIR}/build/${APP_LAMBDA_HANDLER_API}
 # Add more build artifacts here...
 
 echo "Backup build with version"

@@ -55,15 +55,15 @@ Call lambda endpoint
 
     prod
 
-    http "${APP_LAMBDA_BASE}/v1/foo/boo?api_key=123"
+    http "${APP_LAMBDA_BASE_API}/v1/foo/boo?api_key=123"
     
 Add a custom domain to invoke the lambda fn via API gateway,
 all request methods and paths matching the prefix are forwarded to the lambda fn
     
     ./config -env prod \
-    -key APP_API_PATH -value "v1" \
-    -key APP_API_SUBDOMAIN -value api.mozey.co \
-    -key APP_API_DOMAIN -value mozey.co
+    -key APP_GW_PATH_API -value "v1" \
+    -key APP_GW_SUBDOMAIN -value api.mozey.co \
+    -key APP_GW_DOMAIN -value mozey.co
     
     prod && ./scripts/domain.sh
     
@@ -75,9 +75,9 @@ Call API (DNS may take some time to propagate)
 
     prod
 
-    http "${APP_API_BASE}/foo/foo?api_key=123"
+    http "${APP_GW_BASE_API}/foo/foo?api_key=123"
     
-    http "${APP_API_BASE}/bar"
+    http "${APP_GW_BASE_API}/bar"
     
 Build and deploy to update the lambda fn
     
@@ -99,11 +99,13 @@ Install dependencies
 
 Run with live reload    
     
-    dev && make dev
+    dev && make api
     
 Build and deploy lambda fn
 
-    prod && make deploy
+    prod && make build
+    
+    ./scripts/deploy.local.sh ${AWS_PROFILE}
     
 fswatch only `*.go` files in current dir,
 note that the $ sign must be escaped in the Makefile
@@ -181,19 +183,19 @@ see [books-api](https://github.com/mozey/aws-lambda-go/tree/master/examples/book
     
     aws apigateway create-base-path-mapping \
     --base-path ${APP_BOOKS_BASE_PATH} \
-    --domain-name ${APP_API_SUBDOMAIN} \
+    --domain-name ${APP_GW_SUBDOMAIN} \
     --rest-api-id ${APP_BOOKS_API} \
     --stage ${APP_BOOKS_STAGE_NAME} \
     --region ${APP_REGION}
     
 List all path mappings for the custom domain
 
-    aws apigateway get-base-path-mappings --domain-name ${APP_API_SUBDOMAIN}
+    aws apigateway get-base-path-mappings --domain-name ${APP_GW_SUBDOMAIN}
     
 Update config
 
     ./config -env prod \
-    -key APP_BOOKS_BASE -value "https://${APP_API_SUBDOMAIN}/${APP_BOOKS_BASE_PATH}"
+    -key APP_BOOKS_BASE -value "https://${APP_GW_SUBDOMAIN}/${APP_BOOKS_BASE_PATH}"
     
 Test
 

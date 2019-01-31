@@ -33,7 +33,7 @@ fi
 
 # Must fail with "unbound variable" if these are not set
 APP_DIR=${APP_DIR}
-APP_LAMBDA_NAME=${APP_LAMBDA_NAME}
+APP_LAMBDA_NAME_API=${APP_LAMBDA_NAME_API}
 
 #if [ ${AWS_PROFILE} != "xxx" ]
 #then
@@ -55,13 +55,13 @@ function prompt_continue() {
 
 if [ ${PROMPT} != "PROMPT_DISABLED" ]
 then
-    prompt_continue "Deploy lambda fn ${APP_LAMBDA_NAME} to prod?"
+    prompt_continue "Deploy lambda fn ${APP_LAMBDA_NAME_API} to prod?"
 fi
 
 echo
 echo "Updating function code..................................................."
 echo
-aws lambda update-function-code --function-name ${APP_LAMBDA_NAME} \
+aws lambda update-function-code --function-name ${APP_LAMBDA_NAME_API} \
 --zip-file fileb://${APP_DIR}/build/main.zip
 
 echo
@@ -71,7 +71,7 @@ echo
 # NOTE Use lambda default service key for KMS encryption of env vars
 LAMBDA_ENV_CSV=$(${APP_DIR}/config -env prod -csv)
 aws lambda update-function-configuration \
---function-name ${APP_LAMBDA_NAME} \
+--function-name ${APP_LAMBDA_NAME_API} \
 --kms-key-arn "" \
 --environment Variables={${LAMBDA_ENV_CSV}}
 

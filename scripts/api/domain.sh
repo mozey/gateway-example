@@ -10,13 +10,13 @@ bash -c 'set -o pipefail'
 
 # Must fail with "unbound variable" if these are not set
 APP_DIR=${APP_DIR}
-APP_LAMBDA_NAME=${APP_LAMBDA_NAME}
-APP_API_PATH=${APP_API_PATH}
-APP_API_SUBDOMAIN=${APP_API_SUBDOMAIN}
-APP_API_DOMAIN=${APP_API_DOMAIN}
+APP_LAMBDA_NAME_API=${APP_LAMBDA_NAME_API}
+APP_GW_PATH_API=${APP_GW_PATH_API}
+APP_GW_SUBDOMAIN=${APP_GW_SUBDOMAIN}
+APP_GW_DOMAIN=${APP_GW_DOMAIN}
 APP_REGION=${APP_REGION}
-APP_API=${APP_API}
-APP_API_STAGE_NAME=${APP_API_STAGE_NAME}
+APP_GW_ID_API=${APP_GW_ID_API}
+APP_GW_STAGE_NAME_API=${APP_GW_STAGE_NAME_API}
 AWS_PROFILE=${AWS_PROFILE}
 
 function prompt_continue() {
@@ -31,7 +31,7 @@ function prompt_continue() {
     fi
 }
 
-prompt_continue "Create ${APP_API_PATH} mapping for custom domain ${APP_API_SUBDOMAIN}"
+prompt_continue "Create ${APP_GW_PATH_API} mapping for custom domain ${APP_GW_SUBDOMAIN}"
 
 
 # ..............................................................................
@@ -40,16 +40,16 @@ prompt_continue "Create ${APP_API_PATH} mapping for custom domain ${APP_API_SUBD
 CERT_REGION=us-east-1
 
 APP_CERT_ARN=$(aws acm list-certificates --region ${CERT_REGION} | \
-jq -r ".CertificateSummaryList[] | select(.DomainName == \"${APP_API_SUBDOMAIN}\") | .CertificateArn")
+jq -r ".CertificateSummaryList[] | select(.DomainName == \"${APP_GW_SUBDOMAIN}\") | .CertificateArn")
 if [ "${APP_CERT_ARN}" = "" ]
 then
-    echo "Requesting cert for ${APP_API_SUBDOMAIN}"
+    echo "Requesting cert for ${APP_GW_SUBDOMAIN}"
     echo ""
     aws acm request-certificate \
     --region ${CERT_REGION} \
-    --domain-name ${APP_API_SUBDOMAIN} --validation-method DNS
+    --domain-name ${APP_GW_SUBDOMAIN} --validation-method DNS
     APP_CERT_ARN=$(aws acm list-certificates --region ${CERT_REGION} | \
-    jq -r ".CertificateSummaryList[] | select(.DomainName == \"${APP_API_SUBDOMAIN}\") | .CertificateArn")
+    jq -r ".CertificateSummaryList[] | select(.DomainName == \"${APP_GW_SUBDOMAIN}\") | .CertificateArn")
 
     ${APP_DIR}/config -env prod \
     -key "APP_CERT_ARN" -value "${APP_CERT_ARN}"
@@ -63,12 +63,12 @@ jq -r .Certificate.DomainValidationOptions[0].ResourceRecord)
 DNS_VALIDATION_CNAME=$(echo ${DNS_VALIDATION} | jq -r .Name)
 DNS_VALIDATION_VALUE=$(echo ${DNS_VALIDATION} | jq -r .Value)
 APP_DNS_HOSTED_ZONE=$(aws route53 list-hosted-zones | \
-jq -r ".HostedZones[] | select(.Name == \"${APP_API_DOMAIN}.\") | .Id")
+jq -r ".HostedZones[] | select(.Name == \"${APP_GW_DOMAIN}.\") | .Id")
 ${APP_DIR}/config -env prod \
 -key "APP_DNS_HOSTED_ZONE" -value "${APP_DNS_HOSTED_ZONE}"
 if [ "${APP_DNS_HOSTED_ZONE}" = "" ]
 then
-    echo "Invalid APP_API_DOMAIN: no matching hosted zones"
+    echo "Invalid APP_GW_DOMAIN: no matching hosted zones"
     exit 1
 fi
 
@@ -119,31 +119,31 @@ echo "Certificate is verified"
 
 # ..............................................................................
 CREATE_API_DOMAIN=0
-aws apigateway get-domain-name --domain-name ${APP_API_SUBDOMAIN} > /dev/null \
+aws apigateway get-domain-name --domain-name ${APP_GW_SUBDOMAIN} > /dev/null \
 || CREATE_API_DOMAIN=1
 if [ ${CREATE_API_DOMAIN} -eq 1 ]
 then
     echo "Create API domain"
     echo ""
     aws apigateway create-domain-name \
-    --domain-name ${APP_API_SUBDOMAIN} \
-    --certificate-name ${APP_API_SUBDOMAIN} \
+    --domain-name ${APP_GW_SUBDOMAIN} \
+    --certificate-name ${APP_GW_SUBDOMAIN} \
     --region ${APP_REGION} \
     --certificate-arn ${APP_CERT_ARN}
-    APP_API_TARGET=$(aws apigateway get-domain-name \
-    --domain-name ${APP_API_SUBDOMAIN} | \
+    APP_GW_ID_API_TARGET=$(aws apigateway get-domain-name \
+    --domain-name ${APP_GW_SUBDOMAIN} | \
     jq -r .distributionDomainName)
 fi
 
 ## ..............................................................................
-BASE_PATH=${APP_API_PATH}
+BASE_PATH=${APP_GW_PATH_API}
 if [ "${BASE_PATH}" = "" ]
 then
     # Trying to delete an empty base path will error
     BASE_PATH="(none)"
 fi
 EXISTING_BASE_PATH=$(aws apigateway get-base-path-mappings \
---domain-name ${APP_API_SUBDOMAIN} | \
+--domain-name ${APP_GW_SUBDOMAIN} | \
 jq ".items[] | select(.basePath == \"${BASE_PATH}\") | .basePath")
 if [ "${EXISTING_BASE_PATH}" = "" ]
 then
@@ -151,36 +151,36 @@ then
     echo ""
     aws apigateway create-base-path-mapping \
     --base-path ${BASE_PATH} \
-    --domain-name ${APP_API_SUBDOMAIN} \
-    --rest-api-id ${APP_API} \
-    --stage ${APP_API_STAGE_NAME} \
+    --domain-name ${APP_GW_SUBDOMAIN} \
+    --rest-api-id ${APP_GW_ID_API} \
+    --stage ${APP_GW_STAGE_NAME_API} \
     --region ${APP_REGION}
 fi
 
-APP_API_BASE="https://${APP_API_SUBDOMAIN}/${APP_API_PATH}"
+APP_GW_BASE_API="https://${APP_GW_SUBDOMAIN}/${APP_GW_PATH_API}"
 ${APP_DIR}/config -env prod \
--key "APP_API_BASE" -value "${APP_API_BASE}"
+-key "APP_GW_BASE_API" -value "${APP_GW_BASE_API}"
 
 # ..............................................................................
 EXISTING_CNAME=$(aws route53 list-resource-record-sets --hosted-zone-id ${APP_DNS_HOSTED_ZONE} | \
-jq -r ".ResourceRecordSets[] | select(.Name == \"${APP_API_SUBDOMAIN}.\") | .Name")
+jq -r ".ResourceRecordSets[] | select(.Name == \"${APP_GW_SUBDOMAIN}.\") | .Name")
 if [ "${EXISTING_CNAME}" = "" ]
 then
-    echo "Creating CNAME record for ${APP_API_SUBDOMAIN}"
+    echo "Creating CNAME record for ${APP_GW_SUBDOMAIN}"
     echo ""
     echo "
     {
-        \"Comment\": \"Custom domain for lambda fn ${APP_LAMBDA_NAME}\",
+        \"Comment\": \"Custom domain for lambda fn ${APP_LAMBDA_NAME_API}\",
         \"Changes\": [
             {
                 \"Action\": \"CREATE\",
                 \"ResourceRecordSet\": {
-                    \"Name\": \"${APP_API_SUBDOMAIN}\",
+                    \"Name\": \"${APP_GW_SUBDOMAIN}\",
                     \"Type\": \"CNAME\",
                     \"TTL\": 300,
                     \"ResourceRecords\": [
                         {
-                            \"Value\": \"${APP_API_TARGET}\"
+                            \"Value\": \"${APP_GW_ID_API_TARGET}\"
                         }
                     ]
                 }

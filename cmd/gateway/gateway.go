@@ -2,7 +2,7 @@ package main
 
 import (
 	"github.com/apex/gateway"
-	"github.com/mozey/gateway/internal/app"
+	"github.com/mozey/gateway/internal/api/app"
 	"github.com/mozey/gateway/internal/config"
 	"github.com/rs/zerolog/log"
 )
