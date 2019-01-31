@@ -5,7 +5,7 @@ import (
 	"github.com/mozey/gateway/internal/handler"
 )
 
-// Handler for gateway/api
+// Handler for gateway/console
 type Handler struct {
 	*handler.Handler
 }

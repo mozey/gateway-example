@@ -21,7 +21,7 @@ fi
 echo "Building exe"
 cd ${APP_DIR}
 env go build \
--o ${APP_DIR}/gateway-api.out \
-./cmd/dev/api
+-o ${APP_DIR}/gateway-console.out \
+./cmd/dev/console
 
-chmod u+x ${APP_DIR}/gateway-api.out
+chmod u+x ${APP_DIR}/gateway-console.out

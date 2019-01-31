@@ -1,8 +1,8 @@
 package response_test
 
 import (
+	"github.com/mozey/gateway/pkg/response"
 	"github.com/pkg/errors"
-	"github.com/stock2shop/api/pkg/response"
 	"github.com/stretchr/testify/require"
 	"net/http"
 	"net/http/httptest"

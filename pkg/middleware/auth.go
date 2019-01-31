@@ -20,9 +20,13 @@ func Auth(next http.Handler) http.Handler {
 		switch path {
 		case
 			"/",
+
+			"/console",
+
 			"/v1",
 			"/v1/bar",
 			"/v1/status":
+
 			// Call the next handler
 			next.ServeHTTP(w, r)
 			return

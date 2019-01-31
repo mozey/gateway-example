@@ -15,6 +15,7 @@ type IndexResponse struct {
 func (h *Handler) Index(w http.ResponseWriter, r *http.Request) {
 	response.JSON(http.StatusOK, w, r, IndexResponse{
 		Message: "It works!!",
-		Version: h.Config.Version(),
+		Version: h.Config.VersionApi(),
 	})
 }
+

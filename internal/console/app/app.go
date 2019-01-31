@@ -4,9 +4,9 @@ import (
 	"compress/gzip"
 	"fmt"
 	gh "github.com/gorilla/handlers"
-	"github.com/mozey/gateway/internal/api/handlers"
-	"github.com/mozey/gateway/internal/api/routes"
 	"github.com/mozey/gateway/internal/config"
+	"github.com/mozey/gateway/internal/console/handlers"
+	"github.com/mozey/gateway/internal/console/routes"
 	"github.com/mozey/gateway/pkg/middleware"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
@@ -24,7 +24,7 @@ func CreateRouter(conf *config.Config) (h *handlers.Handler, cleanup func()) {
 	h = handlers.NewHandler(conf)
 
 	// Routes
-	routes.Misc(h)
+	routes.Console(h)
 
 	// Router setup
 	h.Router.PanicHandler = middleware.PanicHandler(
@@ -55,10 +55,6 @@ func SetupLogger(conf *config.Config) {
 	if conf.AwsProfile() == "aws-local" {
 		SetDevLogger()
 	}
-
-	// Add contextual fields to the global logger
-	// https://github.com/rs/zerolog#add-contextual-fields-to-the-global-logger
-	log.Logger = log.With().Str("global_ctx", "foo").Logger()
 }
 
 // SetDevLogger configured the logger for dev

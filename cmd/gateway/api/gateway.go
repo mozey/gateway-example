@@ -13,5 +13,5 @@ func main() {
 	h, cleanup := app.CreateRouter(conf)
 	defer cleanup()
 
-	log.Fatal().Err(gateway.ListenAndServe(conf.Port(), h.Handler))
+	log.Fatal().Err(gateway.ListenAndServe("", h.HTTPHandler))
 }

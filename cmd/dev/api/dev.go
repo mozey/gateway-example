@@ -20,7 +20,7 @@ func main() {
 	fmt.Println(".")
 	fmt.Println(".")
 
-	listen := fmt.Sprintf("localhost:%v", conf.Port())
+	listen := fmt.Sprintf("localhost:%v", conf.PortApi())
 	log.Info().Msgf("listening on %s", listen)
-	log.Fatal().Err(http.ListenAndServe(listen, h.Handler))
+	log.Fatal().Err(http.ListenAndServe(listen, h.HTTPHandler))
 }
