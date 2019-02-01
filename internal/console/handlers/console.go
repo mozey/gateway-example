@@ -2,12 +2,13 @@ package handlers
 
 import (
 	"fmt"
+	"github.com/julienschmidt/httprouter"
 	"github.com/mozey/gateway/pkg/response"
 	"github.com/mozey/gateway/web/console"
 	"github.com/pkg/errors"
 	"io/ioutil"
 	"net/http"
-	"strings"
+	"path"
 )
 
 // Bar route handler
@@ -17,19 +18,20 @@ func (h *Handler) Console(w http.ResponseWriter, r *http.Request) {
 
 // Static route handler
 func (h *Handler) Static(w http.ResponseWriter, r *http.Request) {
-	asset := strings.Replace(
-		r.URL.Path, "console", "", 1)
-	file, err := console.VFS.Open(asset)
+	params := httprouter.ParamsFromContext(r.Context())
+	file := params.ByName("file")
+	file = path.Join("static", file)
+	f, err := console.VFS.Open(file)
 	if err != nil {
 		response.JSON(http.StatusInternalServerError, w, r,
-			errors.Wrap(err, fmt.Sprintf("open %s", asset)))
+			errors.Wrap(err, fmt.Sprintf("open %s", file)))
 		return
 	}
-	defer file.Close()
-	b, err := ioutil.ReadAll(file)
+	defer f.Close()
+	b, err := ioutil.ReadAll(f)
 	if err != nil {
 		response.JSON(http.StatusInternalServerError, w, r,
-			errors.Wrap(err, fmt.Sprintf("read %s", asset)))
+			errors.Wrap(err, fmt.Sprintf("read %s", file)))
 		return
 	}
 	response.HTML(http.StatusOK, w, r, b)
