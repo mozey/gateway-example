@@ -21,5 +21,5 @@ config.prod.json
 config
 !config/
 
-change-resource-record-sets.json
+web/console/vfs_vfsdata.go
 

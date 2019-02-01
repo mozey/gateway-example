@@ -75,7 +75,7 @@ func SetDevLogger() {
 // SetupMiddleware configures the middleware given a route handler
 func SetupMiddleware(h *handlers.Handler) {
 	// Middleware in reverse order,
-	h.HTTPHandler = middleware.Auth(h.HTTPHandler)
+	//h.HTTPHandler = middleware.Auth(h.HTTPHandler)
 	//h.HTTPHandler = middleware.RequestLogger(h.HTTPHandler)
 	h.HTTPHandler = gh.CompressHandlerLevel(h.HTTPHandler, gzip.BestSpeed)
 	h.HTTPHandler = middleware.RequestID(h.HTTPHandler)

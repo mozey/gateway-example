@@ -48,3 +48,7 @@ func JSON(code int, w http.ResponseWriter, r *http.Request, resp interface{}) {
 
 	fmt.Fprint(w, string(b))
 }
+
+func HTML(code int, w http.ResponseWriter, r *http.Request, b []byte) {
+	fmt.Fprint(w, string(b))
+}

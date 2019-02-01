@@ -23,5 +23,6 @@
     "APP_PORT_CONSOLE": "8081",
     "APP_REGION": "YOUR_REGION_HERE",
     "APP_VERSION_API": "dev",
+    "APP_VERSION_CONSOLE": "dev",
     "AWS_PROFILE": "aws-local"
 }

@@ -202,6 +202,16 @@ Test
     prod
 
     http ${APP_BOOKS_BASE}/books?isbn=978-1420931693
+    
+    
+## [Embed static assets](https://tech.townsourced.com/post/embedding-static-files-in-go/)
+
+"...compile any necessary files into the application binary itself" with
+[vfsgen](https://github.com/shurcooL/vfsgen)
+
+    dev && make console
+    
+    http "localhost:8081/console/static/index.html"
 
     
 # [apex/gateway](https://github.com/apex/gateway)

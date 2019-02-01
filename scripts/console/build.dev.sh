@@ -21,6 +21,7 @@ fi
 echo "Building exe"
 cd ${APP_DIR}
 env go build \
+-tags dev \
 -o ${APP_DIR}/gateway-console.out \
 ./cmd/dev/console
 

@@ -23,6 +23,10 @@ ${APP_DIR}/config -env prod \
 
 mkdir -p ${APP_DIR}/build/console
 
+# TODO How to include this in source with `//go:generate`?
+cd ${APP_DIR}/web/console
+vfsgendev -source='"github.com/mozey/gateway/web/console".VFS'
+
 # TODO Make binary reproducible,
 # the binary's hash must be the same for the same git revision
 # https://blog.filippo.io/reproducing-go-binaries-byte-by-byte
