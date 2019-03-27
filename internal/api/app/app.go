@@ -2,18 +2,12 @@ package app
 
 import (
 	"compress/gzip"
-	"fmt"
 	gh "github.com/gorilla/handlers"
 	"github.com/mozey/gateway/internal/api/handlers"
 	"github.com/mozey/gateway/internal/api/routes"
 	"github.com/mozey/gateway/internal/config"
+	"github.com/mozey/gateway/pkg/log"
 	"github.com/mozey/gateway/pkg/middleware"
-	"github.com/rs/zerolog"
-	"github.com/rs/zerolog/log"
-	"github.com/rs/zerolog/pkgerrors"
-	"os"
-	"runtime/debug"
-	"time"
 )
 
 // CreateRouter creates a new router.
@@ -34,46 +28,12 @@ func CreateRouter(conf *config.Config) (h *handlers.Handler, cleanup func()) {
 	h.Router.NotFound = middleware.NotFound()
 
 	// Logger
-	SetupLogger(conf)
+	logutil.SetupLogger(conf.AwsProfile() == "aws-local")
 
 	// Middleware
 	SetupMiddleware(h)
 
 	return h, h.Cleanup
-}
-
-// SetupLogger configures the logger
-func SetupLogger(conf *config.Config) {
-	zerolog.TimeFieldFormat = time.RFC3339
-	zerolog.TimestampFieldName = "created"
-	log.Logger = log.With().Caller().Logger()
-
-	// Prod
-	zerolog.SetGlobalLevel(zerolog.InfoLevel)
-	zerolog.ErrorStackMarshaler = pkgerrors.MarshalStack
-
-	if conf.AwsProfile() == "aws-local" {
-		SetDevLogger()
-	}
-
-	// Add contextual fields to the global logger
-	// https://github.com/rs/zerolog#add-contextual-fields-to-the-global-logger
-	log.Logger = log.With().Str("global_ctx", "foo").Logger()
-}
-
-// SetDevLogger configured the logger for dev
-func SetDevLogger() {
-	zerolog.SetGlobalLevel(zerolog.DebugLevel)
-	zerolog.ErrorStackMarshaler = func(err error) interface{} {
-		// TODO Option for ConsoleWriter to format stack traces?
-		fmt.Println(string(debug.Stack()))
-		return nil
-	}
-	log.Logger = log.Output(zerolog.ConsoleWriter{
-		Out:        os.Stderr,
-		NoColor:    false,
-		TimeFormat: time.RFC3339,
-	})
 }
 
 // SetupMiddleware configures the middleware given a route handler
