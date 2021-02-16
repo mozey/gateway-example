@@ -17,8 +17,9 @@ func RequestID(next http.Handler) http.Handler {
 			id, err := ksuid.NewRandom()
 			if err != nil {
 				requestID = err.Error()
+			} else {
+				requestID = id.String()
 			}
-			requestID = id.String()
 		}
 
 		// Header

@@ -26,7 +26,7 @@ GO_FILES=$(git diff --cached --name-only --diff-filter=ACM | grep '\.go$')
 echo "gofmt..."
 gofmt -l ${GO_FILES}
 
-echo "golint..."
-golint -set_exit_status ${GO_FILES}
+#echo "golint..."
+#golint -set_exit_status ${GO_FILES}
 
 
